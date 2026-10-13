@@ -75,7 +75,7 @@ export const Route = createFileRoute("/products/$handle")({
       <Link
         to="/collectie/$slug"
         params={{ slug: "nieuw" }}
-        className="mt-6 inline-block rounded-full bg-primary px-6 py-3 font-semibold text-white"
+        className="mt-6 inline-block rounded-full bg-cta px-6 py-3 font-semibold text-white"
       >
         Bekijk nieuw binnen
       </Link>
@@ -243,21 +243,21 @@ function ProductPage() {
 
           <ShippingBar
             subtotal={subtotal + (p.s ? p.p : 0)}
-            className="mt-5 rounded-xl border border-border bg-white p-4"
+            className="mt-5 rounded-2xl border border-border bg-white p-4"
           />
 
           <ul className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
-            <li className="rounded-xl bg-secondary p-4">
+            <li className="rounded-2xl bg-secondary p-4">
               <Truck className="mb-2 h-5 w-5 text-primary" />
               <p className="font-semibold">Dezelfde dag verzonden</p>
               <p className="text-muted-foreground">Op werkdagen voor 15:00 besteld, met PostNL.</p>
             </li>
-            <li className="rounded-xl bg-secondary p-4">
+            <li className="rounded-2xl bg-secondary p-4">
               <CreditCard className="mb-2 h-5 w-5 text-primary" />
               <p className="font-semibold">Veilig betalen</p>
               <p className="text-muted-foreground">iDEAL, Klarna, creditcard of Bancontact.</p>
             </li>
-            <li className="rounded-xl bg-secondary p-4">
+            <li className="rounded-2xl bg-secondary p-4">
               <PackageCheck className="mb-2 h-5 w-5 text-primary" />
               <p className="font-semibold">Retourneren</p>
               <p className="text-muted-foreground">

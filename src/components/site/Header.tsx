@@ -110,7 +110,7 @@ function MegaPanel({ slug, onNavigate }: { slug: string; onNavigate: () => void 
             to="/products/$handle"
             params={{ handle: feature.h }}
             onClick={onNavigate}
-            className="group relative block overflow-hidden rounded-xl bg-secondary"
+            className="group relative block overflow-hidden rounded-2xl bg-secondary"
           >
             <Photo
               product={feature}

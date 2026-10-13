@@ -32,7 +32,7 @@ function Thanks() {
       {!SITE.checkoutLive && (
         <p
           role="note"
-          className="anim-fade-up mt-6 rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm"
+          className="anim-fade-up mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm"
           style={{ "--i": 3 } as React.CSSProperties}
         >
           <strong>Demo:</strong> de checkout is nog niet gekoppeld aan een betaalprovider. Er is

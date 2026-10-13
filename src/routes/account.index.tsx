@@ -67,7 +67,7 @@ function Orders() {
           <Link
             to="/collectie/$slug"
             params={{ slug: "nieuw" }}
-            className="mt-5 inline-block rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-hover"
+            className="mt-5 inline-block rounded-full bg-cta px-6 py-3 text-sm font-semibold text-white transition "
           >
             Bekijk nieuw binnen
           </Link>

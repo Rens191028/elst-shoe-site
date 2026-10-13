@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { SlidersHorizontal, X } from "lucide-react";
+import { LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   Sheet,
@@ -93,7 +93,7 @@ export const Route = createFileRoute("/collectie/$slug")({
       <h1 className="font-display text-3xl font-extrabold">Deze collectie bestaat niet</h1>
       <Link
         to="/"
-        className="mt-6 inline-block rounded-full bg-primary px-6 py-3 font-semibold text-white"
+        className="mt-6 inline-block rounded-full bg-cta px-6 py-3 font-semibold text-white"
       >
         Naar de homepage
       </Link>
@@ -110,6 +110,7 @@ function CollectionPage() {
   const navigate = useNavigate({ from: Route.fullPath });
   const [shown, setShown] = useState(PAGE);
   const [panel, setPanel] = useState(false);
+  const [view, setView] = useState<"grid" | "list">("grid");
 
   const collection = getCollection(slug)!;
   const base = useMemo(() => inCollection(collection), [collection]);
@@ -198,7 +199,7 @@ function CollectionPage() {
                 <SlidersHorizontal className="h-4 w-4" />
                 Filters
                 {activeCount > 0 && (
-                  <span className="rounded-full bg-primary px-1.5 text-xs text-white">
+                  <span className="rounded-full bg-cta px-1.5 text-xs text-white">
                     {activeCount}
                   </span>
                 )}
@@ -208,20 +209,48 @@ function CollectionPage() {
               {list.length} producten
             </p>
           </div>
-          <label className="flex items-center gap-2 text-sm">
-            <span className="sr-only sm:not-sr-only text-muted-foreground">Sorteren</span>
-            <select
-              value={search.sort ?? "nieuw"}
-              onChange={(e) => set({ sort: e.target.value as Sort })}
-              className="h-10 rounded-full border border-border bg-white px-3 text-sm font-medium"
+          <div className="flex items-center gap-3">
+            <div
+              className="hidden rounded-full border border-border bg-white p-1 sm:flex"
+              role="group"
+              aria-label="Weergave"
             >
-              {SORTS.map((s) => (
-                <option key={s.v} value={s.v}>
-                  {s.l}
-                </option>
+              {(
+                [
+                  ["grid", "Rasterweergave", LayoutGrid],
+                  ["list", "Lijstweergave", List],
+                ] as const
+              ).map(([v, label, Icon]) => (
+                <button
+                  key={v}
+                  type="button"
+                  aria-label={label}
+                  aria-pressed={view === v}
+                  onClick={() => setView(v)}
+                  className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded-full transition",
+                    view === v ? "bg-ink text-white" : "text-muted-foreground hover:text-ink",
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+            <label className="flex items-center gap-2 text-sm">
+              <span className="sr-only sm:not-sr-only text-muted-foreground">Sorteren</span>
+              <select
+                value={search.sort ?? "nieuw"}
+                onChange={(e) => set({ sort: e.target.value as Sort })}
+                className="h-10 rounded-full border border-border bg-white px-3 text-sm font-medium"
+              >
+                {SORTS.map((s) => (
+                  <option key={s.v} value={s.v}>
+                    {s.l}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </div>
 
         {activeCount > 0 && (
@@ -262,7 +291,7 @@ function CollectionPage() {
               </button>
             </div>
           ) : (
-            <ProductGrid products={list.slice(0, shown)} eagerCount={4} />
+            <ProductGrid products={list.slice(0, shown)} eagerCount={4} view={view} />
           )}
           {list.length > shown && (
             <div className="mt-12 text-center">
@@ -389,7 +418,7 @@ function CollectionPage() {
             <button
               type="button"
               onClick={() => setPanel(false)}
-              className="w-full rounded-full bg-primary py-3.5 text-sm font-semibold text-white transition hover:bg-primary-hover"
+              className="w-full rounded-full bg-cta py-3.5 text-sm font-semibold text-white transition "
             >
               Toon {list.length} producten
             </button>

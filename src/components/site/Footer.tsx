@@ -7,8 +7,7 @@ import { Logo } from "@/components/site/Logo";
 import { KiyohBadge } from "@/components/site/product";
 
 const CODE = "WELKOM10";
-const linkCls =
-  "link-underline text-sm text-muted-foreground transition-colors hover:text-primary";
+const linkCls = "link-underline text-sm text-muted-foreground transition-colors hover:text-primary";
 
 function Newsletter() {
   const [email, setEmail] = useState("");
@@ -54,7 +53,7 @@ function Newsletter() {
               </p>
               <p className="mt-3 text-sm text-muted-foreground">Jouw kortingscode:</p>
               <div className="mt-1.5 flex items-center gap-2">
-                <code className="flex-1 rounded-xl border-2 border-dashed border-primary bg-background px-4 py-2.5 text-center font-display text-xl font-extrabold tracking-widest text-primary">
+                <code className="flex-1 rounded-2xl border-2 border-dashed border-primary bg-background px-4 py-2.5 text-center font-display text-xl font-extrabold tracking-widest text-primary">
                   {CODE}
                 </code>
                 <button
@@ -63,7 +62,7 @@ function Newsletter() {
                     void navigator.clipboard?.writeText(CODE);
                     setCopied(true);
                   }}
-                  className="flex h-12 shrink-0 items-center gap-1.5 rounded-xl bg-ink px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary"
+                  className="flex h-12 shrink-0 items-center gap-1.5 rounded-2xl bg-ink px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary"
                 >
                   {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   {copied ? "Gekopieerd" : "Kopieer"}
@@ -92,7 +91,7 @@ function Newsletter() {
                 <button
                   type="submit"
                   disabled={state === "loading"}
-                  className="group/btn flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover active:scale-[0.97] disabled:opacity-70"
+                  className="group/btn flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-cta px-6 text-sm font-semibold text-primary-foreground transition active:scale-[0.97] disabled:opacity-70"
                 >
                   {state === "loading" ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -163,7 +162,12 @@ export function Footer() {
                   {s.icon}
                 </a>
               ) : (
-                <span key={s.key} aria-label={`${s.label} (binnenkort)`} title="Binnenkort" className={`${socialCls} opacity-60`}>
+                <span
+                  key={s.key}
+                  aria-label={`${s.label} (binnenkort)`}
+                  title="Binnenkort"
+                  className={`${socialCls} opacity-60`}
+                >
                   {s.icon}
                 </span>
               );
@@ -211,20 +215,20 @@ export function Footer() {
             </Link>
           </li>
           <li className="pt-1">
-            <div className="inline-block rounded-xl border border-border bg-card px-4 py-3">
+            <div className="inline-block rounded-2xl border border-border bg-card px-4 py-3">
               <KiyohBadge className="items-start" />
             </div>
           </li>
         </Column>
       </div>
 
-      <div className="border-t border-border bg-background">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 py-4 text-xs text-muted-foreground md:flex-row md:justify-between lg:px-6">
+      <div className="border-t border-border bg-ink">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 py-4 text-xs text-white/70 md:flex-row md:justify-between lg:px-6">
           <ul className="flex flex-wrap justify-center gap-2" aria-label="Betaalmethoden">
             {["iDEAL", "Klarna", "Creditcard"].map((m) => (
               <li
                 key={m}
-                className="rounded-md border border-border bg-card px-2.5 py-1 font-semibold text-ink"
+                className="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 font-semibold text-white"
               >
                 {m}
               </li>

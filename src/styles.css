@@ -67,6 +67,7 @@
   --chart-4: #99471f;
   --chart-5: #e4e1d9;
   --primary-hover: #99471f;
+  --cream: #f4f1ea;
   --ink: #141413;
   --soft: #8c8679;
   --font-body: "Inter", system-ui, sans-serif;
@@ -75,6 +76,7 @@
 @theme inline {
   --color-primary-hover: var(--primary-hover);
   --color-ink: var(--ink);
+  --color-cream: var(--cream);
   --color-soft: var(--soft);
   --font-display: "Archivo", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
@@ -91,7 +93,10 @@
     font-family: var(--font-body);
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: "Archivo", system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
@@ -230,5 +235,50 @@
   }
   html {
     scroll-behavior: auto;
+  }
+}
+
+/* Visuele verdieping: CTA-gradient, zachte schaduwen, skeletons, karaktervollere koppen */
+@utility bg-cta {
+  background-image: linear-gradient(135deg, #c4663b 0%, #b5582e 55%, #a24d27 100%);
+  &:hover {
+    background-image: linear-gradient(135deg, #b05a31 0%, #99471f 100%);
+  }
+}
+@utility shadow-soft {
+  box-shadow:
+    0 1px 2px rgba(20, 20, 19, 0.05),
+    0 8px 24px -12px rgba(20, 20, 19, 0.18);
+}
+@utility shadow-lift {
+  box-shadow:
+    0 2px 4px rgba(20, 20, 19, 0.06),
+    0 18px 36px -16px rgba(20, 20, 19, 0.35);
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(100deg, #efece5 30%, #f8f6f1 50%, #efece5 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@layer base {
+  /* Archivo heeft een breedte-as: iets bredere koppen geven meer karakter, body blijft Inter 400 */
+  h1,
+  h2 {
+    font-stretch: 112%;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 800;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
   }
 }
