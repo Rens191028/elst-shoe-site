@@ -15,7 +15,7 @@ export const Route = createFileRoute("/verzending-retour")({
   }),
   component: () => (
     <InfoPage title="Verzending & retour">
-      <div>
+      <div id="verzending" className="scroll-mt-28">
         <h2>Verzending</h2>
         <p>
           Op werkdagen voor 15:00 besteld, verzenden we dezelfde dag met PostNL. Verzendkosten zijn{" "}
@@ -26,10 +26,10 @@ export const Route = createFileRoute("/verzending-retour")({
         <h2>Betalen</h2>
         <p>Betaal met iDEAL, Klarna (achteraf betalen), creditcard of Bancontact.</p>
       </div>
-      <div>
+      <div id="retour" className="scroll-mt-28">
         <h2>Retourneren</h2>
         <p>
-          Past of bevalt je bestelling niet? Meld je retour via{" "}
+          Je hebt 30 dagen om te retourneren. Meld je retour via{" "}
           <a href={`mailto:${SITE.email}?subject=Retour`}>{SITE.email}</a> en we vertellen je
           precies wat je moet doen. Twijfel je over je maat? Gebruik eerst ons maatadvies.
         </p>

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AfrekenenRouteImport } from './routes/afrekenen'
 import { Route as BedanktRouteImport } from './routes/bedankt'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FavorietenRouteImport } from './routes/favorieten'
 import { Route as MaatadviesRouteImport } from './routes/maatadvies'
 import { Route as OverOnsRouteImport } from './routes/over-ons'
@@ -40,6 +41,11 @@ const BedanktRoute = BedanktRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FavorietenRoute = FavorietenRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/afrekenen': typeof AfrekenenRoute
   '/bedankt': typeof BedanktRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/favorieten': typeof FavorietenRoute
   '/maatadvies': typeof MaatadviesRoute
   '/over-ons': typeof OverOnsRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/afrekenen': typeof AfrekenenRoute
   '/bedankt': typeof BedanktRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/favorieten': typeof FavorietenRoute
   '/maatadvies': typeof MaatadviesRoute
   '/over-ons': typeof OverOnsRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/afrekenen': typeof AfrekenenRoute
   '/bedankt': typeof BedanktRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/favorieten': typeof FavorietenRoute
   '/maatadvies': typeof MaatadviesRoute
   '/over-ons': typeof OverOnsRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/afrekenen'
     | '/bedankt'
     | '/contact'
+    | '/faq'
     | '/favorieten'
     | '/maatadvies'
     | '/over-ons'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/afrekenen'
     | '/bedankt'
     | '/contact'
+    | '/faq'
     | '/favorieten'
     | '/maatadvies'
     | '/over-ons'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/afrekenen'
     | '/bedankt'
     | '/contact'
+    | '/faq'
     | '/favorieten'
     | '/maatadvies'
     | '/over-ons'
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   AfrekenenRoute: typeof AfrekenenRoute
   BedanktRoute: typeof BedanktRoute
   ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
   FavorietenRoute: typeof FavorietenRoute
   MaatadviesRoute: typeof MaatadviesRoute
   OverOnsRoute: typeof OverOnsRoute
@@ -214,6 +227,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/favorieten': {
@@ -280,6 +300,7 @@ const rootRouteChildren: RootRouteChildren = {
   AfrekenenRoute: AfrekenenRoute,
   BedanktRoute: BedanktRoute,
   ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
   FavorietenRoute: FavorietenRoute,
   MaatadviesRoute: MaatadviesRoute,
   OverOnsRoute: OverOnsRoute,
