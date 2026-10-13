@@ -10,22 +10,35 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as AfrekenenRouteImport } from './routes/afrekenen'
 import { Route as BedanktRouteImport } from './routes/bedankt'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FavorietenRouteImport } from './routes/favorieten'
+import { Route as InloggenRouteImport } from './routes/inloggen'
 import { Route as MaatadviesRouteImport } from './routes/maatadvies'
 import { Route as OverOnsRouteImport } from './routes/over-ons'
+import { Route as RegistrerenRouteImport } from './routes/registreren'
 import { Route as VerzendingRetourRouteImport } from './routes/verzending-retour'
+import { Route as WachtwoordResettenRouteImport } from './routes/wachtwoord-resetten'
+import { Route as WachtwoordVergetenRouteImport } from './routes/wachtwoord-vergeten'
 import { Route as WinkelwagenRouteImport } from './routes/winkelwagen'
 import { Route as ZoekenRouteImport } from './routes/zoeken'
+import { Route as AccountIndexRouteImport } from './routes/account.index'
+import { Route as AccountFavorietenRouteImport } from './routes/account.favorieten'
+import { Route as AccountGegevensRouteImport } from './routes/account.gegevens'
 import { Route as CollectieSlugRouteImport } from './routes/collectie.$slug'
 import { Route as ProductsHandleRouteImport } from './routes/products.$handle'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AfrekenenRoute = AfrekenenRouteImport.update({
@@ -53,6 +66,11 @@ const FavorietenRoute = FavorietenRouteImport.update({
   path: '/favorieten',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InloggenRoute = InloggenRouteImport.update({
+  id: '/inloggen',
+  path: '/inloggen',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MaatadviesRoute = MaatadviesRouteImport.update({
   id: '/maatadvies',
   path: '/maatadvies',
@@ -63,9 +81,24 @@ const OverOnsRoute = OverOnsRouteImport.update({
   path: '/over-ons',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegistrerenRoute = RegistrerenRouteImport.update({
+  id: '/registreren',
+  path: '/registreren',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerzendingRetourRoute = VerzendingRetourRouteImport.update({
   id: '/verzending-retour',
   path: '/verzending-retour',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WachtwoordResettenRoute = WachtwoordResettenRouteImport.update({
+  id: '/wachtwoord-resetten',
+  path: '/wachtwoord-resetten',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WachtwoordVergetenRoute = WachtwoordVergetenRouteImport.update({
+  id: '/wachtwoord-vergeten',
+  path: '/wachtwoord-vergeten',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WinkelwagenRoute = WinkelwagenRouteImport.update({
@@ -77,6 +110,21 @@ const ZoekenRoute = ZoekenRouteImport.update({
   id: '/zoeken',
   path: '/zoeken',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountFavorietenRoute = AccountFavorietenRouteImport.update({
+  id: '/favorieten',
+  path: '/favorieten',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountGegevensRoute = AccountGegevensRouteImport.update({
+  id: '/gegevens',
+  path: '/gegevens',
+  getParentRoute: () => AccountRoute,
 } as any)
 const CollectieSlugRoute = CollectieSlugRouteImport.update({
   id: '/collectie/$slug',
@@ -91,18 +139,26 @@ const ProductsHandleRoute = ProductsHandleRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteWithChildren
   '/afrekenen': typeof AfrekenenRoute
   '/bedankt': typeof BedanktRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/favorieten': typeof FavorietenRoute
+  '/inloggen': typeof InloggenRoute
   '/maatadvies': typeof MaatadviesRoute
   '/over-ons': typeof OverOnsRoute
+  '/registreren': typeof RegistrerenRoute
   '/verzending-retour': typeof VerzendingRetourRoute
+  '/wachtwoord-resetten': typeof WachtwoordResettenRoute
+  '/wachtwoord-vergeten': typeof WachtwoordVergetenRoute
   '/winkelwagen': typeof WinkelwagenRoute
   '/zoeken': typeof ZoekenRoute
+  '/account/favorieten': typeof AccountFavorietenRoute
+  '/account/gegevens': typeof AccountGegevensRoute
   '/collectie/$slug': typeof CollectieSlugRoute
   '/products/$handle': typeof ProductsHandleRoute
+  '/account/': typeof AccountIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -111,46 +167,69 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/favorieten': typeof FavorietenRoute
+  '/inloggen': typeof InloggenRoute
   '/maatadvies': typeof MaatadviesRoute
   '/over-ons': typeof OverOnsRoute
+  '/registreren': typeof RegistrerenRoute
   '/verzending-retour': typeof VerzendingRetourRoute
+  '/wachtwoord-resetten': typeof WachtwoordResettenRoute
+  '/wachtwoord-vergeten': typeof WachtwoordVergetenRoute
   '/winkelwagen': typeof WinkelwagenRoute
   '/zoeken': typeof ZoekenRoute
+  '/account/favorieten': typeof AccountFavorietenRoute
+  '/account/gegevens': typeof AccountGegevensRoute
   '/collectie/$slug': typeof CollectieSlugRoute
   '/products/$handle': typeof ProductsHandleRoute
+  '/account': typeof AccountIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRouteWithChildren
   '/afrekenen': typeof AfrekenenRoute
   '/bedankt': typeof BedanktRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/favorieten': typeof FavorietenRoute
+  '/inloggen': typeof InloggenRoute
   '/maatadvies': typeof MaatadviesRoute
   '/over-ons': typeof OverOnsRoute
+  '/registreren': typeof RegistrerenRoute
   '/verzending-retour': typeof VerzendingRetourRoute
+  '/wachtwoord-resetten': typeof WachtwoordResettenRoute
+  '/wachtwoord-vergeten': typeof WachtwoordVergetenRoute
   '/winkelwagen': typeof WinkelwagenRoute
   '/zoeken': typeof ZoekenRoute
+  '/account/favorieten': typeof AccountFavorietenRoute
+  '/account/gegevens': typeof AccountGegevensRoute
   '/collectie/$slug': typeof CollectieSlugRoute
   '/products/$handle': typeof ProductsHandleRoute
+  '/account/': typeof AccountIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
     | '/afrekenen'
     | '/bedankt'
     | '/contact'
     | '/faq'
     | '/favorieten'
+    | '/inloggen'
     | '/maatadvies'
     | '/over-ons'
+    | '/registreren'
     | '/verzending-retour'
+    | '/wachtwoord-resetten'
+    | '/wachtwoord-vergeten'
     | '/winkelwagen'
     | '/zoeken'
+    | '/account/favorieten'
+    | '/account/gegevens'
     | '/collectie/$slug'
     | '/products/$handle'
+    | '/account/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -159,40 +238,60 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/favorieten'
+    | '/inloggen'
     | '/maatadvies'
     | '/over-ons'
+    | '/registreren'
     | '/verzending-retour'
+    | '/wachtwoord-resetten'
+    | '/wachtwoord-vergeten'
     | '/winkelwagen'
     | '/zoeken'
+    | '/account/favorieten'
+    | '/account/gegevens'
     | '/collectie/$slug'
     | '/products/$handle'
+    | '/account'
   id:
     | '__root__'
     | '/'
+    | '/account'
     | '/afrekenen'
     | '/bedankt'
     | '/contact'
     | '/faq'
     | '/favorieten'
+    | '/inloggen'
     | '/maatadvies'
     | '/over-ons'
+    | '/registreren'
     | '/verzending-retour'
+    | '/wachtwoord-resetten'
+    | '/wachtwoord-vergeten'
     | '/winkelwagen'
     | '/zoeken'
+    | '/account/favorieten'
+    | '/account/gegevens'
     | '/collectie/$slug'
     | '/products/$handle'
+    | '/account/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRouteWithChildren
   AfrekenenRoute: typeof AfrekenenRoute
   BedanktRoute: typeof BedanktRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   FavorietenRoute: typeof FavorietenRoute
+  InloggenRoute: typeof InloggenRoute
   MaatadviesRoute: typeof MaatadviesRoute
   OverOnsRoute: typeof OverOnsRoute
+  RegistrerenRoute: typeof RegistrerenRoute
   VerzendingRetourRoute: typeof VerzendingRetourRoute
+  WachtwoordResettenRoute: typeof WachtwoordResettenRoute
+  WachtwoordVergetenRoute: typeof WachtwoordVergetenRoute
   WinkelwagenRoute: typeof WinkelwagenRoute
   ZoekenRoute: typeof ZoekenRoute
   CollectieSlugRoute: typeof CollectieSlugRoute
@@ -206,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/afrekenen': {
@@ -243,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FavorietenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inloggen': {
+      id: '/inloggen'
+      path: '/inloggen'
+      fullPath: '/inloggen'
+      preLoaderRoute: typeof InloggenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/maatadvies': {
       id: '/maatadvies'
       path: '/maatadvies'
@@ -257,11 +370,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OverOnsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/registreren': {
+      id: '/registreren'
+      path: '/registreren'
+      fullPath: '/registreren'
+      preLoaderRoute: typeof RegistrerenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verzending-retour': {
       id: '/verzending-retour'
       path: '/verzending-retour'
       fullPath: '/verzending-retour'
       preLoaderRoute: typeof VerzendingRetourRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wachtwoord-resetten': {
+      id: '/wachtwoord-resetten'
+      path: '/wachtwoord-resetten'
+      fullPath: '/wachtwoord-resetten'
+      preLoaderRoute: typeof WachtwoordResettenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wachtwoord-vergeten': {
+      id: '/wachtwoord-vergeten'
+      path: '/wachtwoord-vergeten'
+      fullPath: '/wachtwoord-vergeten'
+      preLoaderRoute: typeof WachtwoordVergetenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/winkelwagen': {
@@ -277,6 +411,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/zoeken'
       preLoaderRoute: typeof ZoekenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/account/': {
+      id: '/account/'
+      path: '/'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/favorieten': {
+      id: '/account/favorieten'
+      path: '/favorieten'
+      fullPath: '/account/favorieten'
+      preLoaderRoute: typeof AccountFavorietenRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/gegevens': {
+      id: '/account/gegevens'
+      path: '/gegevens'
+      fullPath: '/account/gegevens'
+      preLoaderRoute: typeof AccountGegevensRouteImport
+      parentRoute: typeof AccountRoute
     }
     '/collectie/$slug': {
       id: '/collectie/$slug'
@@ -295,16 +450,36 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AccountRouteChildren {
+  AccountFavorietenRoute: typeof AccountFavorietenRoute
+  AccountGegevensRoute: typeof AccountGegevensRoute
+  AccountIndexRoute: typeof AccountIndexRoute
+}
+
+const AccountRouteChildren: AccountRouteChildren = {
+  AccountFavorietenRoute: AccountFavorietenRoute,
+  AccountGegevensRoute: AccountGegevensRoute,
+  AccountIndexRoute: AccountIndexRoute,
+}
+
+const AccountRouteWithChildren =
+  AccountRoute._addFileChildren(AccountRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRouteWithChildren,
   AfrekenenRoute: AfrekenenRoute,
   BedanktRoute: BedanktRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   FavorietenRoute: FavorietenRoute,
+  InloggenRoute: InloggenRoute,
   MaatadviesRoute: MaatadviesRoute,
   OverOnsRoute: OverOnsRoute,
+  RegistrerenRoute: RegistrerenRoute,
   VerzendingRetourRoute: VerzendingRetourRoute,
+  WachtwoordResettenRoute: WachtwoordResettenRoute,
+  WachtwoordVergetenRoute: WachtwoordVergetenRoute,
   WinkelwagenRoute: WinkelwagenRoute,
   ZoekenRoute: ZoekenRoute,
   CollectieSlugRoute: CollectieSlugRoute,

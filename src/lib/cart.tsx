@@ -24,13 +24,10 @@ type Ctx = {
   setQty: (h: string, size: string, qty: number) => void;
   remove: (h: string, size: string) => void;
   clear: () => void;
-  wishlist: string[];
-  toggleWish: (h: string) => void;
 };
 
 const CartContext = createContext<Ctx | null>(null);
 const CART_KEY = "gs-cart-v1";
-const WISH_KEY = "gs-wish-v1";
 
 function load<T>(key: string, fallback: T): T {
   try {
@@ -50,21 +47,16 @@ function save(key: string, value: unknown) {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [raw, setRaw] = useState<CartLine[]>([]);
-  const [wishlist, setWishlist] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setRaw(load<CartLine[]>(CART_KEY, []).filter((l) => getProduct(l.h)));
-    setWishlist(load<string[]>(WISH_KEY, []));
     setReady(true);
   }, []);
   useEffect(() => {
     if (ready) save(CART_KEY, raw);
   }, [raw, ready]);
-  useEffect(() => {
-    if (ready) save(WISH_KEY, wishlist);
-  }, [wishlist, ready]);
 
   const add = useCallback((h: string, size: string, qty = 1) => {
     setRaw((cur) => {
@@ -88,11 +80,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [],
   );
   const clear = useCallback(() => setRaw([]), []);
-  const toggleWish = useCallback(
-    (h: string) =>
-      setWishlist((cur) => (cur.includes(h) ? cur.filter((x) => x !== h) : [...cur, h])),
-    [],
-  );
 
   const value = useMemo<Ctx>(() => {
     const lines = raw.flatMap((l) => {
@@ -113,10 +100,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setQty,
       remove,
       clear,
-      wishlist,
-      toggleWish,
     };
-  }, [raw, open, add, setQty, remove, clear, wishlist, toggleWish]);
+  }, [raw, open, add, setQty, remove, clear]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

@@ -16,10 +16,10 @@ export function Logo({ className }: { className?: string }) {
     <Link
       to="/"
       aria-label="GoedkopeSchoenen — naar de homepage"
-      className={cn("logo-link flex items-center gap-2.5", className)}
+      className={cn("logo-link flex items-center gap-2 sm:gap-2.5", className)}
     >
       <LogoMark />
-      <span className="font-display text-[1.15rem] font-extrabold tracking-tight text-ink">
+      <span className="font-display text-[0.92rem] font-extrabold sm:text-[1.15rem] tracking-tight text-ink">
         GoedkopeSchoenen
       </span>
     </Link>
