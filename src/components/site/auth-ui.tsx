@@ -70,7 +70,7 @@ export function SubmitButton({
       type="submit"
       disabled={busy}
       className={cn(
-        "flex h-12 w-full items-center justify-center rounded-full bg-primary font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-lg active:scale-[0.98] disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0",
+        "flex h-12 w-full items-center justify-center rounded-full bg-cta font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0",
         className,
       )}
     >

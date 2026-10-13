@@ -31,7 +31,7 @@ function CartPage() {
             <Link
               to="/collectie/$slug"
               params={{ slug: "nieuw" }}
-              className="mt-6 inline-block rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-hover"
+              className="mt-6 inline-block rounded-full bg-cta px-6 py-3 text-sm font-semibold text-white transition "
             >
               Verder winkelen
             </Link>
@@ -41,7 +41,7 @@ function CartPage() {
             <div>
               <ShippingBar
                 subtotal={subtotal}
-                className="rounded-xl border border-border bg-white p-4"
+                className="rounded-2xl border border-border bg-white p-4"
               />
               <ul className="mt-2">
                 {lines.map((l) => (
@@ -71,7 +71,7 @@ function CartPage() {
               <p className="text-xs text-muted-foreground">Incl. btw.</p>
               <Link
                 to="/afrekenen"
-                className="group flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-lg active:scale-[0.98]"
+                className="group flex w-full items-center justify-center gap-2 rounded-full bg-cta py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]"
               >
                 Afrekenen <span className="transition-transform group-hover:translate-x-1">→</span>
               </Link>

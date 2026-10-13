@@ -3,6 +3,8 @@ import { Info, Lock } from "lucide-react";
 import { useState } from "react";
 import { money } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
+import { KiyohBadge } from "@/components/site/product";
 import { SITE } from "@/lib/site";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Photo } from "@/components/site/product";
@@ -38,6 +40,7 @@ function Field({
 
 function Checkout() {
   const { lines, subtotal, shipping, total } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [method, setMethod] = useState(METHODS[0]!);
 
@@ -48,7 +51,7 @@ function Checkout() {
         <Link
           to="/collectie/$slug"
           params={{ slug: "nieuw" }}
-          className="mt-6 inline-block rounded-full bg-primary px-6 py-3 font-semibold text-white"
+          className="mt-6 inline-block rounded-full bg-cta px-6 py-3 font-semibold text-white"
         >
           Verder winkelen
         </Link>
@@ -64,10 +67,29 @@ function Checkout() {
       />
       <section className="mx-auto max-w-7xl px-4 pb-8 pt-4 lg:px-6">
         <h1 className="font-display text-4xl font-extrabold tracking-tight">Afrekenen</h1>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm">
+          <p className="text-muted-foreground">
+            {user ? (
+              <>Je bestelt als {user.email}.</>
+            ) : (
+              <>
+                Bestellen als gast kan: je hoeft niet in te loggen. Liever met account?{" "}
+                <Link
+                  to="/inloggen"
+                  search={{ redirect: "/afrekenen" }}
+                  className="font-semibold text-ink underline underline-offset-4 hover:text-primary"
+                >
+                  Log in
+                </Link>
+              </>
+            )}
+          </p>
+          <KiyohBadge />
+        </div>
         {!SITE.checkoutLive && (
           <div
             role="note"
-            className="mt-6 flex gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm"
+            className="mt-6 flex gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm"
           >
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <p>
@@ -122,7 +144,7 @@ function Checkout() {
                   <label
                     key={m}
                     className={cn(
-                      "flex cursor-pointer items-center gap-3 rounded-xl border bg-white p-4 text-sm font-medium transition",
+                      "flex cursor-pointer items-center gap-3 rounded-2xl border bg-white p-4 text-sm font-medium transition",
                       method === m
                         ? "border-ink ring-1 ring-ink"
                         : "border-border hover:border-ink",
@@ -182,7 +204,7 @@ function Checkout() {
             </dl>
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-lg active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-cta py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]"
             >
               <Lock className="h-4 w-4" /> Bestelling plaatsen
             </button>

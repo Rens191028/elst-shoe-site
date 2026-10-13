@@ -99,7 +99,7 @@ function SizeAdvice() {
                     aria-checked={fit === f.v}
                     onClick={() => setFit(f.v)}
                     className={cn(
-                      "rounded-xl border p-4 text-left transition active:scale-[0.98]",
+                      "rounded-2xl border p-4 text-left transition active:scale-[0.98]",
                       fit === f.v ? "border-ink ring-1 ring-ink" : "border-border hover:border-ink",
                     )}
                   >
@@ -127,7 +127,7 @@ function SizeAdvice() {
                 to="/collectie/$slug"
                 params={{ slug: "schoenen" }}
                 search={{ maat: String(size) }}
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-hover"
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-cta px-7 py-3.5 font-semibold text-white transition hover:-translate-y-0.5 "
               >
                 Bekijk schoenen in maat {size} <ArrowRight className="h-4 w-4" />
               </Link>

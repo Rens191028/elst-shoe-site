@@ -11,7 +11,7 @@ export const SITE = {
   email: "info@goedkopeschoenen.com",
   founded: 2012,
   // Controleer deze cijfers bij livegang (uit eerdere analyse van de live site).
-  kiyoh: { score: 9.3, count: 6531 },
+  kiyoh: { score: 9.3, count: 6531, url: "" },
   freeShippingFrom: 65,
   shippingCost: 5.99,
   // Vul de echte profiel-URL's in; alleen ingevulde netwerken worden getoond.
@@ -26,6 +26,9 @@ export const SITE = {
 
 // Echte klantcitaten hier invullen; de sectie op de homepage verschijnt zodra er items zijn.
 export const REVIEWS: { name: string; stars: number; text: string }[] = [];
+
+// Echte Instagram/UGC-foto's (klantfoto's of eigen posts); de strook bij de sale verschijnt zodra er items zijn.
+export const UGC: { image: string; href: string; alt: string }[] = [];
 
 export const ANNOUNCEMENTS = [
   "Gratis verzending vanaf €65",

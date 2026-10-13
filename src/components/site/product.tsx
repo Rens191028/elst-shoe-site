@@ -22,11 +22,14 @@ export function Photo({
   sizes?: string | undefined;
 }) {
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const ref = useRef<HTMLImageElement>(null);
-  // Een afbeelding die al faalde voordat React hydrateerde, krijgt geen onError meer
+  // Een afbeelding die al klaar was (of faalde) voordat React hydrateerde, krijgt geen onLoad/onError meer
   useEffect(() => {
     const el = ref.current;
-    if (el?.complete && el.naturalWidth === 0) setFailed(true);
+    if (!el?.complete) return;
+    if (el.naturalWidth === 0) setFailed(true);
+    else setLoaded(true);
   }, []);
   if (failed)
     return (
@@ -49,8 +52,9 @@ export function Photo({
       height={Math.round(width * 1.25)}
       loading={eager ? "eager" : "lazy"}
       decoding="async"
+      onLoad={() => setLoaded(true)}
       onError={() => setFailed(true)}
-      className={className}
+      className={cn(className, !loaded && "skeleton")}
     />
   );
 }
@@ -123,12 +127,15 @@ export function ProductCard({
   product,
   index = 0,
   eager,
+  view = "grid",
 }: {
   product: Product;
   index?: number;
   eager?: boolean;
+  view?: "grid" | "list";
 }) {
   const { add } = useCart();
+  const list = view === "list";
   const [picking, setPicking] = useState(false);
   const [added, setAdded] = useState(false);
 
@@ -140,8 +147,13 @@ export function ProductCard({
   };
 
   return (
-    <article className="group relative" data-index={index}>
-      <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-secondary transition duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_14px_30px_-14px_rgba(20,20,19,0.35)]">
+    <article className={cn("group relative", list && "flex gap-4 sm:gap-6")} data-index={index}>
+      <div
+        className={cn(
+          "relative aspect-[4/5] overflow-hidden rounded-2xl bg-secondary shadow-soft transition duration-300 group-hover:-translate-y-1 group-hover:shadow-lift",
+          list && "w-32 shrink-0 sm:w-44",
+        )}
+      >
         <Link
           to="/products/$handle"
           params={{ handle: product.h }}
@@ -199,27 +211,37 @@ export function ProductCard({
           </div>
         )}
       </div>
-      <div className="mt-3 space-y-1 px-0.5">
-        <h3 className="line-clamp-2 min-h-[2.6em] font-sans text-sm font-medium leading-snug tracking-normal text-ink">
+      <div className={cn("space-y-1 px-0.5", list ? "flex-1 pt-2" : "mt-3")}>
+        <h3
+          className={cn(
+            "line-clamp-2 font-sans font-medium leading-snug tracking-normal text-ink",
+            list ? "text-base" : "min-h-[2.6em] text-sm",
+          )}
+        >
           <Link to="/products/$handle" params={{ handle: product.h }} className="hover:underline">
             {product.t}
           </Link>
         </h3>
         <Price product={product} />
+        {list && (
+          <p className="pt-1 text-sm text-muted-foreground">
+            {product.k.length > 0 && <span>{product.k.join(", ")}</span>}
+            {product.m.length > 0 && (
+              <span>
+                {product.k.length > 0 ? " · " : ""}maat {product.m[0]}–
+                {product.m[product.m.length - 1]}
+              </span>
+            )}
+          </p>
+        )}
       </div>
     </article>
   );
 }
 
 export function KiyohBadge({ className, dark }: { className?: string; dark?: boolean }) {
-  return (
-    <div
-      className={cn(
-        "inline-flex items-center gap-2 text-sm",
-        dark ? "text-white" : "text-ink",
-        className,
-      )}
-    >
+  const inner = (
+    <>
       <span className="flex" aria-hidden="true">
         {[0, 1, 2, 3, 4].map((i) => (
           <Star key={i} className="h-4 w-4 fill-primary text-primary" />
@@ -232,22 +254,47 @@ export function KiyohBadge({ className, dark }: { className?: string; dark?: boo
           · {SITE.kiyoh.count.toLocaleString("nl-NL")} beoordelingen op Kiyoh
         </span>
       </span>
-    </div>
+    </>
+  );
+  const cls = cn(
+    "inline-flex items-center gap-2 text-sm",
+    dark ? "text-white" : "text-ink",
+    className,
+  );
+  return SITE.kiyoh.url ? (
+    <a
+      href={SITE.kiyoh.url}
+      target="_blank"
+      rel="noreferrer"
+      className={cn(cls, "hover:opacity-80")}
+    >
+      {inner}
+    </a>
+  ) : (
+    <div className={cls}>{inner}</div>
   );
 }
 
 export function ProductGrid({
   products,
   eagerCount = 0,
+  view = "grid",
 }: {
   products: Product[];
   eagerCount?: number;
+  view?: "grid" | "list";
 }) {
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+    <div
+      className={
+        view === "list"
+          ? "grid gap-6 md:grid-cols-2"
+          : "grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4"
+      }
+    >
       {products.map((p, i) => (
         <Reveal key={p.h} index={i % 4}>
-          <ProductCard product={p} index={i} eager={i < eagerCount} />
+          <ProductCard product={p} index={i} eager={i < eagerCount} view={view} />
         </Reveal>
       ))}
     </div>

@@ -225,7 +225,7 @@ export function CartDrawer() {
               to="/collectie/$slug"
               params={{ slug: "nieuw" }}
               onClick={() => setOpen(false)}
-              className="mt-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-hover"
+              className="mt-2 rounded-full bg-cta px-6 py-3 text-sm font-semibold text-white transition "
             >
               Bekijk nieuw binnen
             </Link>
@@ -261,7 +261,7 @@ export function CartDrawer() {
               <Link
                 to="/afrekenen"
                 onClick={() => setOpen(false)}
-                className="group flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-lg active:scale-[0.98]"
+                className="group flex w-full items-center justify-center gap-2 rounded-full bg-cta py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]"
               >
                 Afrekenen
                 <span className="transition-transform group-hover:translate-x-1">→</span>
