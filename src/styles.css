@@ -41,32 +41,43 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.975 0.012 85);
-  --foreground: oklch(0.24 0.03 50);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.03 50);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.03 50);
-  --primary: oklch(0.55 0.19 45);
-  --primary-foreground: oklch(0.985 0.01 90);
-  --secondary: oklch(0.93 0.03 80);
-  --secondary-foreground: oklch(0.3 0.04 50);
-  --muted: oklch(0.94 0.02 80);
-  --muted-foreground: oklch(0.5 0.03 55);
-  --accent: oklch(0.32 0.05 45);
-  --accent-foreground: oklch(0.97 0.01 85);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.89 0.02 75);
-  --input: oklch(0.89 0.02 75);
-  --ring: oklch(0.55 0.19 45);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --font-display: "Archivo", system-ui, sans-serif;
+  /* Huisstijl: grijs/zwart basis, één terracotta accent (CLAUDE.md §3.2) */
+  --background: #fafaf8;
+  --foreground: #141413;
+  --card: #ffffff;
+  --card-foreground: #141413;
+  --popover: #ffffff;
+  --popover-foreground: #141413;
+  --primary: #b5582e;
+  --primary-foreground: #ffffff;
+  --secondary: #f0eee8;
+  --secondary-foreground: #141413;
+  --muted: #f0eee8;
+  --muted-foreground: #5b5953;
+  --accent: #f0eee8;
+  --accent-foreground: #141413;
+  --destructive: #b5582e;
+  --destructive-foreground: #ffffff;
+  --border: #e4e1d9;
+  --input: #e4e1d9;
+  --ring: #b5582e;
+  --chart-1: #b5582e;
+  --chart-2: #141413;
+  --chart-3: #8c8679;
+  --chart-4: #99471f;
+  --chart-5: #e4e1d9;
+  --primary-hover: #99471f;
+  --ink: #141413;
+  --soft: #8c8679;
   --font-body: "Inter", system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-primary-hover: var(--primary-hover);
+  --color-ink: var(--ink);
+  --color-soft: var(--soft);
+  --font-display: "Archivo", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
 }
 
 @layer base {
@@ -81,11 +92,143 @@
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-display);
+    font-family: "Archivo", system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
 }
 
 @utility text-balance {
   text-wrap: balance;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Animaties: kort en rustig (200–400ms), zie CLAUDE.md §4 */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pulseSoft {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 0%, transparent);
+  }
+}
+@keyframes gradientDrift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes menuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.anim-fade-up {
+  opacity: 0;
+  animation: fadeUp 560ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 480ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.badge-pulse {
+  animation: pulseSoft 2.4s ease-in-out infinite;
+}
+.hero-surface {
+  background: linear-gradient(120deg, #f0e3d8, #ead2c0 45%, #f4ece4);
+  background-size: 220% 220%;
+  animation: gradientDrift 9s ease-in-out infinite;
+}
+.menu-panel {
+  animation: menuIn 220ms ease-out;
+}
+.link-underline {
+  background: linear-gradient(currentColor, currentColor) left bottom / 0 1.5px no-repeat;
+  transition: background-size 260ms ease;
+}
+.link-underline:hover,
+.link-underline[data-active="true"] {
+  background-size: 100% 1.5px;
+}
+.snap-row {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.snap-row::-webkit-scrollbar {
+  display: none;
+}
+.snap-row > * {
+  scroll-snap-align: start;
+}
+.logo-bars span {
+  display: block;
+  width: 5px;
+  border-radius: 2px;
+  transform: skewX(-18deg);
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.logo-link:hover .logo-bars span:nth-child(1) {
+  transform: skewX(-18deg) translateX(-2px);
+}
+.logo-link:hover .logo-bars span:nth-child(3) {
+  transform: skewX(-18deg) translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up,
+  .reveal {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+  .hero-surface,
+  .badge-pulse {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }

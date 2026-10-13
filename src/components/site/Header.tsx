@@ -1,0 +1,495 @@
+import { Link, useNavigate } from "@tanstack/react-router";
+import { ChevronDown, Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { countIn, GROUPS, inCollection, money, searchProducts, SUBS } from "@/lib/catalog";
+import { useCart } from "@/lib/cart";
+import { ANNOUNCEMENTS } from "@/lib/site";
+import { Logo } from "@/components/site/Logo";
+import { Photo } from "@/components/site/product";
+import { cn } from "@/lib/utils";
+
+type MenuColumn = { title: string; items: string[] };
+const MEGA: Record<string, MenuColumn[]> = {
+  schoenen: [
+    { title: "Laarzen & boots", items: ["laarzen", "boots-festival"] },
+    { title: "Sneakers", items: ["sneakers"] },
+    { title: "Instappers & meer", items: ["pantoffels", "overig-schoenen"] },
+  ],
+  tassen: [{ title: "Tassen", items: ["schoudertasjes", "grote-tassen"] }],
+  accessoires: [{ title: "Accessoires", items: ["portemonnees", "sieraden"] }],
+};
+
+function Announcement() {
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setI((x) => (x + 1) % ANNOUNCEMENTS.length), 5000);
+    return () => clearInterval(t);
+  }, [paused]);
+  return (
+    <div
+      className="bg-ink text-white"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <p
+        key={i}
+        className="anim-fade-up mx-auto max-w-7xl px-4 py-2 text-center text-xs font-medium tracking-wide"
+        aria-live="off"
+      >
+        {ANNOUNCEMENTS[i]}
+      </p>
+    </div>
+  );
+}
+
+function MegaPanel({ slug, onNavigate }: { slug: string; onNavigate: () => void }) {
+  const group = GROUPS.find((g) => g.slug === slug)!;
+  const feature = useMemo(() => inCollection(group).find((p) => p.s), [group]);
+  return (
+    <div className="menu-panel absolute inset-x-0 top-full border-b border-border bg-background shadow-[0_24px_40px_-24px_rgba(20,20,19,0.25)]">
+      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_280px] gap-10 px-6 py-8">
+        <div className="grid grid-cols-3 gap-8">
+          {MEGA[slug]?.map((col) => (
+            <div key={col.title}>
+              <p className="mb-3 text-xs font-bold uppercase tracking-widest text-soft">
+                {col.title}
+              </p>
+              <ul className="space-y-2">
+                {col.items.map((s) => {
+                  const sub = SUBS.find((x) => x.slug === s)!;
+                  return (
+                    <li key={s}>
+                      <Link
+                        to="/collectie/$slug"
+                        params={{ slug: s }}
+                        onClick={onNavigate}
+                        className="group flex items-baseline gap-2 text-[0.95rem] font-medium text-ink hover:text-primary"
+                      >
+                        {sub.title}
+                        <span className="text-xs font-normal text-soft">{countIn(s)}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+          <div className="col-span-3 mt-2 flex gap-5 border-t border-border pt-4 text-sm">
+            <Link
+              to="/collectie/$slug"
+              params={{ slug }}
+              onClick={onNavigate}
+              className="font-semibold text-ink underline-offset-4 hover:underline"
+            >
+              Alles in {group.title.toLowerCase()} ({countIn(slug)})
+            </Link>
+            <Link
+              to="/collectie/$slug"
+              params={{ slug: "sale" }}
+              onClick={onNavigate}
+              className="font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              Bekijk de sale
+            </Link>
+          </div>
+        </div>
+        {feature && (
+          <Link
+            to="/products/$handle"
+            params={{ handle: feature.h }}
+            onClick={onNavigate}
+            className="group relative block overflow-hidden rounded-xl bg-secondary"
+          >
+            <Photo
+              product={feature}
+              width={400}
+              className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105"
+              sizes="280px"
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-white/80">
+                Uitgelicht
+              </p>
+              <p className="line-clamp-1 text-sm font-semibold">{feature.t}</p>
+              <p className="text-sm">{money(feature.p)}</p>
+            </div>
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SearchDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  const [q, setQ] = useState("");
+  const navigate = useNavigate();
+  const found = useMemo(() => searchProducts(q), [q]);
+  const cols = useMemo(
+    () =>
+      q.trim().length > 1
+        ? [...GROUPS, ...SUBS]
+            .filter((c) => c.title.toLowerCase().includes(q.trim().toLowerCase()))
+            .slice(0, 3)
+        : [],
+    [q],
+  );
+  const go = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!q.trim()) return;
+    onOpenChange(false);
+    void navigate({ to: "/zoeken", search: { q: q.trim() } });
+  };
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="top-[12%] max-w-2xl translate-y-0 gap-0 overflow-hidden p-0 [&>button]:hidden">
+        <DialogTitle className="sr-only">Zoeken</DialogTitle>
+        <DialogDescription className="sr-only">
+          Zoek in ons assortiment van 750 producten
+        </DialogDescription>
+        <form
+          onSubmit={go}
+          className="flex items-center gap-3 border-b border-border px-4"
+          role="search"
+        >
+          <Search className="h-5 w-5 text-soft" />
+          <input
+            autoFocus
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder='Probeer "stevige winterboots onder €40"'
+            aria-label="Zoek producten"
+            className="h-14 flex-1 bg-transparent text-base outline-none placeholder:text-soft"
+          />
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            aria-label="Sluiten"
+            className="rounded-full p-1.5 hover:bg-secondary"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </form>
+        <div className="max-h-[60vh] overflow-y-auto p-3">
+          {!q.trim() && (
+            <div className="p-3 text-sm text-muted-foreground">
+              <p className="mb-3 font-semibold text-ink">Populair</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "zwarte laarzen",
+                  "sneakers onder €25",
+                  "festival boots",
+                  "pantoffels",
+                  "tas roze",
+                  "sale",
+                ].map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setQ(s)}
+                    className="rounded-full border border-border px-3 py-1.5 text-sm hover:border-ink hover:text-ink"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {cols.map((c) => (
+            <Link
+              key={c.slug}
+              to="/collectie/$slug"
+              params={{ slug: c.slug }}
+              onClick={() => onOpenChange(false)}
+              className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm hover:bg-secondary"
+            >
+              <span className="font-semibold">{c.title}</span>
+              <span className="text-xs text-soft">Categorie · {countIn(c.slug)}</span>
+            </Link>
+          ))}
+          {q.trim() &&
+            found.results.slice(0, 6).map((p) => (
+              <Link
+                key={p.h}
+                to="/products/$handle"
+                params={{ handle: p.h }}
+                onClick={() => onOpenChange(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-secondary"
+              >
+                <Photo
+                  product={p}
+                  width={120}
+                  className="h-12 w-10 rounded object-cover"
+                  sizes="40px"
+                />
+                <span className="line-clamp-1 flex-1 text-sm">{p.t}</span>
+                <span className="text-sm font-semibold">{money(p.p)}</span>
+              </Link>
+            ))}
+          {q.trim() && found.results.length === 0 && cols.length === 0 && (
+            <p className="p-4 text-sm text-muted-foreground">
+              Geen resultaten voor “{q}”. Probeer een kleur, soort of maximumprijs.
+            </p>
+          )}
+          {found.results.length > 6 && (
+            <button
+              type="button"
+              onClick={() => go()}
+              className="mt-1 w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-primary hover:bg-secondary"
+            >
+              Alle {found.results.length} resultaten bekijken →
+            </button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function Header() {
+  const { count, setOpen, wishlist } = useCart();
+  const [scrolled, setScrolled] = useState(false);
+  const [menu, setMenu] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 40);
+    on();
+    window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenu(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const openMenu = (slug: string | null) => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setMenu(slug);
+  };
+  const scheduleClose = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setMenu(null), 140);
+  };
+
+  const iconBtn =
+    "relative flex h-10 w-10 items-center justify-center rounded-full text-ink transition hover:-translate-y-0.5 hover:bg-secondary active:scale-90";
+
+  return (
+    <>
+      <Announcement />
+      <header
+        className={cn(
+          "sticky top-0 z-40 border-b transition-all duration-[260ms]",
+          scrolled
+            ? "border-border bg-background/85 shadow-sm backdrop-blur-md"
+            : "border-transparent bg-background",
+        )}
+        onMouseLeave={scheduleClose}
+      >
+        <div
+          className={cn(
+            "mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 transition-all duration-[260ms] lg:px-6",
+            scrolled ? "py-2" : "py-4",
+          )}
+        >
+          <div className="flex items-center gap-1 lg:hidden">
+            <button
+              type="button"
+              className={iconBtn}
+              aria-label="Menu openen"
+              onClick={() => setMobileOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          </div>
+          <Logo />
+          <nav className="hidden items-center gap-1 lg:flex" aria-label="Hoofdmenu">
+            {GROUPS.map((g) => (
+              <div
+                key={g.slug}
+                onMouseEnter={() => openMenu(g.slug)}
+                onFocus={() => openMenu(g.slug)}
+              >
+                <Link
+                  to="/collectie/$slug"
+                  params={{ slug: g.slug }}
+                  onClick={() => setMenu(null)}
+                  aria-expanded={menu === g.slug}
+                  className="flex items-center gap-1 px-4 py-2 text-[0.95rem] font-semibold text-ink"
+                >
+                  <span className="link-underline" data-active={menu === g.slug}>
+                    {g.title}
+                  </span>
+                  <ChevronDown
+                    className={cn(
+                      "h-3.5 w-3.5 transition-transform",
+                      menu === g.slug && "rotate-180",
+                    )}
+                  />
+                </Link>
+              </div>
+            ))}
+            <Link
+              to="/collectie/$slug"
+              params={{ slug: "sale" }}
+              onMouseEnter={() => openMenu(null)}
+              className="px-4 py-2 text-[0.95rem] font-semibold text-primary"
+            >
+              <span className="link-underline">Sale</span>
+            </Link>
+          </nav>
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              className={iconBtn}
+              aria-label="Zoeken"
+              onClick={() => setSearchOpen(true)}
+            >
+              <Search className="h-5 w-5" />
+            </button>
+            <Link
+              to="/favorieten"
+              className={cn(iconBtn, "hidden sm:flex")}
+              aria-label={`Favorieten (${wishlist.length})`}
+            >
+              <Heart className="h-5 w-5" />
+              {wishlist.length > 0 && (
+                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
+              )}
+            </Link>
+            <button
+              type="button"
+              className={iconBtn}
+              aria-label={`Winkelwagen, ${count} artikelen`}
+              onClick={() => setOpen(true)}
+            >
+              <ShoppingBag className="h-5 w-5" />
+              {count > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white">
+                  {count}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+        {menu && MEGA[menu] && (
+          <div onMouseEnter={() => openMenu(menu)} className="hidden lg:block">
+            <MegaPanel slug={menu} onNavigate={() => setMenu(null)} />
+          </div>
+        )}
+      </header>
+
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
+
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="w-[88%] overflow-y-auto bg-background p-0">
+          <SheetHeader className="border-b border-border p-4 text-left">
+            <SheetTitle className="font-display font-extrabold">Menu</SheetTitle>
+            <SheetDescription className="sr-only">Navigeer door de winkel</SheetDescription>
+          </SheetHeader>
+          <div className="p-2">
+            {GROUPS.map((g) => (
+              <details key={g.slug} className="group border-b border-border">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-4 font-display text-lg font-bold">
+                  {g.title}
+                  <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                </summary>
+                <ul className="pb-3 pl-3">
+                  <li>
+                    <Link
+                      to="/collectie/$slug"
+                      params={{ slug: g.slug }}
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-3 py-2 text-sm font-semibold"
+                    >
+                      Alles in {g.title.toLowerCase()}
+                    </Link>
+                  </li>
+                  {SUBS.filter((s) => s.group === g.slug).map((s) => (
+                    <li key={s.slug}>
+                      <Link
+                        to="/collectie/$slug"
+                        params={{ slug: s.slug }}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex justify-between px-3 py-2 text-sm text-muted-foreground"
+                      >
+                        {s.title}
+                        <span className="text-xs">{countIn(s.slug)}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ))}
+            {[
+              { to: "/collectie/$slug", slug: "sale", label: "Sale", cls: "text-primary" },
+              { to: "/collectie/$slug", slug: "nieuw", label: "Nieuw binnen", cls: "" },
+            ].map((l) => (
+              <Link
+                key={l.slug}
+                to="/collectie/$slug"
+                params={{ slug: l.slug }}
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  "block border-b border-border px-3 py-4 font-display text-lg font-bold",
+                  l.cls,
+                )}
+              >
+                {l.label}
+              </Link>
+            ))}
+            <div className="space-y-1 px-3 py-4 text-sm">
+              <Link
+                to="/maatadvies"
+                onClick={() => setMobileOpen(false)}
+                className="block py-2 font-medium"
+              >
+                Maatadvies
+              </Link>
+              <Link
+                to="/favorieten"
+                onClick={() => setMobileOpen(false)}
+                className="block py-2 font-medium"
+              >
+                Favorieten
+              </Link>
+              <Link
+                to="/verzending-retour"
+                onClick={() => setMobileOpen(false)}
+                className="block py-2 font-medium"
+              >
+                Verzending & retour
+              </Link>
+              <Link
+                to="/contact"
+                onClick={() => setMobileOpen(false)}
+                className="block py-2 font-medium"
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}
