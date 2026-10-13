@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ChevronDown, Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { ChevronDown, Heart, Menu, Search, ShoppingBag, X, User } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/sheet";
 import { countIn, GROUPS, inCollection, money, searchProducts, SUBS } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
+import { useFavorites } from "@/lib/favorites";
 import { ANNOUNCEMENTS } from "@/lib/site";
 import { Logo } from "@/components/site/Logo";
 import { Photo } from "@/components/site/product";
@@ -262,7 +264,9 @@ function SearchDialog({
 }
 
 export function Header() {
-  const { count, setOpen, wishlist } = useCart();
+  const { count, setOpen } = useCart();
+  const { user } = useAuth();
+  const { handles: favs } = useFavorites();
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -291,7 +295,7 @@ export function Header() {
   };
 
   const iconBtn =
-    "relative flex h-10 w-10 items-center justify-center rounded-full text-ink transition hover:-translate-y-0.5 hover:bg-secondary active:scale-90";
+    "relative flex h-9 w-9 items-center justify-center rounded-full sm:h-10 sm:w-10 text-ink transition hover:-translate-y-0.5 hover:bg-secondary active:scale-90";
 
   return (
     <>
@@ -307,7 +311,7 @@ export function Header() {
       >
         <div
           className={cn(
-            "mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 transition-all duration-[260ms] lg:px-6",
+            "mx-auto flex max-w-7xl items-center justify-between gap-1 px-3 transition-all sm:gap-4 sm:px-4 duration-[260ms] lg:px-6",
             scrolled ? "py-2" : "py-4",
           )}
         >
@@ -369,12 +373,19 @@ export function Header() {
             <Link
               to="/favorieten"
               className={cn(iconBtn, "hidden sm:flex")}
-              aria-label={`Favorieten (${wishlist.length})`}
+              aria-label={`Favorieten (${favs.length})`}
             >
               <Heart className="h-5 w-5" />
-              {wishlist.length > 0 && (
+              {favs.length > 0 && (
                 <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
               )}
+            </Link>
+            <Link
+              to={user ? "/account" : "/inloggen"}
+              className={iconBtn}
+              aria-label={user ? "Mijn account" : "Inloggen"}
+            >
+              <User className={cn("h-5 w-5", user && "fill-ink")} />
             </Link>
             <button
               type="button"
@@ -471,6 +482,13 @@ export function Header() {
                 className="block py-2 font-medium"
               >
                 Favorieten
+              </Link>
+              <Link
+                to={user ? "/account" : "/inloggen"}
+                onClick={() => setMobileOpen(false)}
+                className="block py-2 font-medium"
+              >
+                {user ? "Mijn account" : "Inloggen of registreren"}
               </Link>
               <Link
                 to="/verzending-retour"

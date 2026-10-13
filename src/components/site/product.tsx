@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Heart, ImageOff, Plus, Check, Star } from "lucide-react";
 import { discountPct, img, isNew, money, type Product } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
+import { useFavorites } from "@/lib/favorites";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/site/motion";
@@ -100,12 +101,12 @@ export function Badges({ product }: { product: Product }) {
 }
 
 export function WishButton({ handle, className }: { handle: string; className?: string }) {
-  const { wishlist, toggleWish } = useCart();
-  const on = wishlist.includes(handle);
+  const { has, toggle } = useFavorites();
+  const on = has(handle);
   return (
     <button
       type="button"
-      onClick={() => toggleWish(handle)}
+      onClick={() => void toggle(handle)}
       aria-pressed={on}
       aria-label={on ? "Verwijder van favorieten" : "Bewaar als favoriet"}
       className={cn(
