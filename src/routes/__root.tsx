@@ -12,22 +12,26 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { CartProvider } from "@/lib/cart";
+import { Header } from "@/components/site/Header";
+import { Footer } from "@/components/site/Footer";
+import { CartDrawer } from "@/components/site/cart";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Pagina niet gevonden</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          Deze pagina bestaat niet (meer). Bekijk onze nieuwste collectie.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Go home
+            Naar de homepage
           </Link>
         </div>
       </div>
@@ -46,10 +50,10 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          Deze pagina kon niet laden
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Er ging iets mis aan onze kant. Probeer het opnieuw of ga terug naar de homepage.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -59,13 +63,13 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            Opnieuw proberen
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            Naar de homepage
           </a>
         </div>
       </div>
@@ -78,10 +82,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "GoedkopeSchoenen.com — Betaalbare schoenen uit Elst" },
-      { name: "description", content: "Trendy schoenen voor het hele gezin, voor een eerlijke lage prijs. Uit Elst, voor heel Nederland." },
-      { property: "og:title", content: "GoedkopeSchoenen.com — Betaalbare schoenen uit Elst" },
-      { property: "og:description", content: "Trendy schoenen voor het hele gezin, voor een eerlijke lage prijs. Uit Elst, voor heel Nederland." },
+      { title: "GoedkopeSchoenen.com — Betaalbare schoenen, tassen & accessoires" },
+      {
+        name: "description",
+        content:
+          "Trendy schoenen, tassen en accessoires vanaf €8,99. Op werkdagen voor 15:00 besteld, dezelfde dag verzonden. Gratis verzending vanaf €65.",
+      },
+      {
+        property: "og:title",
+        content: "GoedkopeSchoenen.com — Betaalbare schoenen, tassen & accessoires",
+      },
+      {
+        property: "og:description",
+        content:
+          "Trendy schoenen, tassen en accessoires vanaf €8,99. Op werkdagen voor 15:00 besteld, dezelfde dag verzonden. Gratis verzending vanaf €65.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "GoedkopeSchoenen.com" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -95,9 +110,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
     ],
   }),
   shellComponent: RootShell,
@@ -108,7 +124,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="nl">
       <head>
         <HeadContent />
       </head>
@@ -125,8 +141,21 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <CartProvider>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-white"
+        >
+          Meteen naar de content
+        </a>
+        <Header />
+        <main id="main">
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </main>
+        <Footer />
+        <CartDrawer />
+      </CartProvider>
     </QueryClientProvider>
   );
 }

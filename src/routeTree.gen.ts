@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AfrekenenRouteImport } from './routes/afrekenen'
+import { Route as BedanktRouteImport } from './routes/bedankt'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FavorietenRouteImport } from './routes/favorieten'
+import { Route as MaatadviesRouteImport } from './routes/maatadvies'
+import { Route as OverOnsRouteImport } from './routes/over-ons'
+import { Route as VerzendingRetourRouteImport } from './routes/verzending-retour'
+import { Route as WinkelwagenRouteImport } from './routes/winkelwagen'
+import { Route as ZoekenRouteImport } from './routes/zoeken'
+import { Route as CollectieSlugRouteImport } from './routes/collectie.$slug'
+import { Route as ProductsHandleRouteImport } from './routes/products.$handle'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AfrekenenRoute = AfrekenenRouteImport.update({
+  id: '/afrekenen',
+  path: '/afrekenen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BedanktRoute = BedanktRouteImport.update({
+  id: '/bedankt',
+  path: '/bedankt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavorietenRoute = FavorietenRouteImport.update({
+  id: '/favorieten',
+  path: '/favorieten',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaatadviesRoute = MaatadviesRouteImport.update({
+  id: '/maatadvies',
+  path: '/maatadvies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OverOnsRoute = OverOnsRouteImport.update({
+  id: '/over-ons',
+  path: '/over-ons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerzendingRetourRoute = VerzendingRetourRouteImport.update({
+  id: '/verzending-retour',
+  path: '/verzending-retour',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WinkelwagenRoute = WinkelwagenRouteImport.update({
+  id: '/winkelwagen',
+  path: '/winkelwagen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZoekenRoute = ZoekenRouteImport.update({
+  id: '/zoeken',
+  path: '/zoeken',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectieSlugRoute = CollectieSlugRouteImport.update({
+  id: '/collectie/$slug',
+  path: '/collectie/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsHandleRoute = ProductsHandleRouteImport.update({
+  id: '/products/$handle',
+  path: '/products/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/afrekenen': typeof AfrekenenRoute
+  '/bedankt': typeof BedanktRoute
+  '/contact': typeof ContactRoute
+  '/favorieten': typeof FavorietenRoute
+  '/maatadvies': typeof MaatadviesRoute
+  '/over-ons': typeof OverOnsRoute
+  '/verzending-retour': typeof VerzendingRetourRoute
+  '/winkelwagen': typeof WinkelwagenRoute
+  '/zoeken': typeof ZoekenRoute
+  '/collectie/$slug': typeof CollectieSlugRoute
+  '/products/$handle': typeof ProductsHandleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/afrekenen': typeof AfrekenenRoute
+  '/bedankt': typeof BedanktRoute
+  '/contact': typeof ContactRoute
+  '/favorieten': typeof FavorietenRoute
+  '/maatadvies': typeof MaatadviesRoute
+  '/over-ons': typeof OverOnsRoute
+  '/verzending-retour': typeof VerzendingRetourRoute
+  '/winkelwagen': typeof WinkelwagenRoute
+  '/zoeken': typeof ZoekenRoute
+  '/collectie/$slug': typeof CollectieSlugRoute
+  '/products/$handle': typeof ProductsHandleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/afrekenen': typeof AfrekenenRoute
+  '/bedankt': typeof BedanktRoute
+  '/contact': typeof ContactRoute
+  '/favorieten': typeof FavorietenRoute
+  '/maatadvies': typeof MaatadviesRoute
+  '/over-ons': typeof OverOnsRoute
+  '/verzending-retour': typeof VerzendingRetourRoute
+  '/winkelwagen': typeof WinkelwagenRoute
+  '/zoeken': typeof ZoekenRoute
+  '/collectie/$slug': typeof CollectieSlugRoute
+  '/products/$handle': typeof ProductsHandleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/afrekenen'
+    | '/bedankt'
+    | '/contact'
+    | '/favorieten'
+    | '/maatadvies'
+    | '/over-ons'
+    | '/verzending-retour'
+    | '/winkelwagen'
+    | '/zoeken'
+    | '/collectie/$slug'
+    | '/products/$handle'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/afrekenen'
+    | '/bedankt'
+    | '/contact'
+    | '/favorieten'
+    | '/maatadvies'
+    | '/over-ons'
+    | '/verzending-retour'
+    | '/winkelwagen'
+    | '/zoeken'
+    | '/collectie/$slug'
+    | '/products/$handle'
+  id:
+    | '__root__'
+    | '/'
+    | '/afrekenen'
+    | '/bedankt'
+    | '/contact'
+    | '/favorieten'
+    | '/maatadvies'
+    | '/over-ons'
+    | '/verzending-retour'
+    | '/winkelwagen'
+    | '/zoeken'
+    | '/collectie/$slug'
+    | '/products/$handle'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AfrekenenRoute: typeof AfrekenenRoute
+  BedanktRoute: typeof BedanktRoute
+  ContactRoute: typeof ContactRoute
+  FavorietenRoute: typeof FavorietenRoute
+  MaatadviesRoute: typeof MaatadviesRoute
+  OverOnsRoute: typeof OverOnsRoute
+  VerzendingRetourRoute: typeof VerzendingRetourRoute
+  WinkelwagenRoute: typeof WinkelwagenRoute
+  ZoekenRoute: typeof ZoekenRoute
+  CollectieSlugRoute: typeof CollectieSlugRoute
+  ProductsHandleRoute: typeof ProductsHandleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +195,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/afrekenen': {
+      id: '/afrekenen'
+      path: '/afrekenen'
+      fullPath: '/afrekenen'
+      preLoaderRoute: typeof AfrekenenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bedankt': {
+      id: '/bedankt'
+      path: '/bedankt'
+      fullPath: '/bedankt'
+      preLoaderRoute: typeof BedanktRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorieten': {
+      id: '/favorieten'
+      path: '/favorieten'
+      fullPath: '/favorieten'
+      preLoaderRoute: typeof FavorietenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maatadvies': {
+      id: '/maatadvies'
+      path: '/maatadvies'
+      fullPath: '/maatadvies'
+      preLoaderRoute: typeof MaatadviesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/over-ons': {
+      id: '/over-ons'
+      path: '/over-ons'
+      fullPath: '/over-ons'
+      preLoaderRoute: typeof OverOnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verzending-retour': {
+      id: '/verzending-retour'
+      path: '/verzending-retour'
+      fullPath: '/verzending-retour'
+      preLoaderRoute: typeof VerzendingRetourRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/winkelwagen': {
+      id: '/winkelwagen'
+      path: '/winkelwagen'
+      fullPath: '/winkelwagen'
+      preLoaderRoute: typeof WinkelwagenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zoeken': {
+      id: '/zoeken'
+      path: '/zoeken'
+      fullPath: '/zoeken'
+      preLoaderRoute: typeof ZoekenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collectie/$slug': {
+      id: '/collectie/$slug'
+      path: '/collectie/$slug'
+      fullPath: '/collectie/$slug'
+      preLoaderRoute: typeof CollectieSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products/$handle': {
+      id: '/products/$handle'
+      path: '/products/$handle'
+      fullPath: '/products/$handle'
+      preLoaderRoute: typeof ProductsHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AfrekenenRoute: AfrekenenRoute,
+  BedanktRoute: BedanktRoute,
+  ContactRoute: ContactRoute,
+  FavorietenRoute: FavorietenRoute,
+  MaatadviesRoute: MaatadviesRoute,
+  OverOnsRoute: OverOnsRoute,
+  VerzendingRetourRoute: VerzendingRetourRoute,
+  WinkelwagenRoute: WinkelwagenRoute,
+  ZoekenRoute: ZoekenRoute,
+  CollectieSlugRoute: CollectieSlugRoute,
+  ProductsHandleRoute: ProductsHandleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
