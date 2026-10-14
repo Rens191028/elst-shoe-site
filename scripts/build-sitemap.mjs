@@ -12,7 +12,7 @@ const collections = [
   "schoudertasjes", "grote-tassen", "portemonnees", "sieraden",
   "sale", "nieuw",
 ];
-const pages = ["/", "/over-ons", "/contact", "/faq", "/verzending-retour", "/maatadvies"];
+const pages = ["/", "/over-ons", "/contact", "/faq", "/verzending-retour", "/maatadvies", "/cadeaubon"];
 const newest = products.reduce((m, p) => (p.a > m ? p.a : m), "");
 
 const url = (loc, lastmod, priority) =>

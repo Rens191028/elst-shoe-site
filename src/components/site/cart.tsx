@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { crossSell, money, type Product } from "@/lib/catalog";
+import { crossSell, money, variantLabel, type Product } from "@/lib/catalog";
 import { useCart, type DetailedLine } from "@/lib/cart";
 import { SITE } from "@/lib/site";
 import { Photo, Price } from "@/components/site/product";
@@ -42,6 +42,64 @@ export function ShippingBar({ subtotal, className }: { subtotal: number; classNa
           style={{ width: `${pct}%` }}
         />
       </div>
+    </div>
+  );
+}
+
+type PriceInfo = {
+  subtotal: number;
+  discount: number;
+  bundle: { title: string } | null;
+  hint?: string | null;
+  shipping: number;
+  total: number;
+};
+
+/** Bedragenoverzicht met bundelkorting; gedeeld door lade, winkelwagenpagina en checkout. */
+export function PriceRows({
+  price,
+  big,
+  className,
+}: {
+  price: PriceInfo;
+  big?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <dl className={cn("text-sm", big ? "space-y-2" : "space-y-1")}>
+        <div className="flex justify-between">
+          <dt className="text-muted-foreground">Subtotaal</dt>
+          <dd>{money(price.subtotal)}</dd>
+        </div>
+        {price.discount > 0 && (
+          <div className="flex justify-between font-semibold text-primary-text">
+            <dt>Bundelkorting</dt>
+            <dd>−{money(price.discount)}</dd>
+          </div>
+        )}
+        <div className="flex justify-between">
+          <dt className="text-muted-foreground">Verzending</dt>
+          <dd>{price.shipping === 0 ? "Gratis" : money(price.shipping)}</dd>
+        </div>
+        <div
+          className={cn(
+            "flex justify-between pt-1 font-bold",
+            big ? "border-t border-border pt-3 text-lg" : "text-base",
+          )}
+        >
+          <dt>Totaal</dt>
+          <dd>{money(price.total)}</dd>
+        </div>
+      </dl>
+      {price.bundle && price.discount > 0 && (
+        <p className="mt-2 text-xs text-muted-foreground">{price.bundle.title}</p>
+      )}
+      {price.hint && (
+        <p className="mt-2 rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-primary-text">
+          {price.hint}
+        </p>
+      )}
     </div>
   );
 }
@@ -107,9 +165,7 @@ export function CartLineRow({ line, big }: { line: DetailedLine; big?: boolean }
           >
             {p.t}
           </Link>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {line.size ? `Maat ${line.size}` : "Eén maat"}
-          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{variantLabel(p, line.size)}</p>
         </div>
         <div className="flex items-center justify-between">
           <QtyStepper line={line} compact />
@@ -199,7 +255,19 @@ export function CrossSell({
 }
 
 export function CartDrawer() {
-  const { open, setOpen, lines, subtotal, shipping, total, count } = useCart();
+  const {
+    open,
+    setOpen,
+    lines,
+    net,
+    subtotal,
+    discount,
+    bundle,
+    bundleHint,
+    shipping,
+    total,
+    count,
+  } = useCart();
   const suggestions = crossSell(lines.map((l) => l.h));
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -234,7 +302,7 @@ export function CartDrawer() {
         ) : (
           <>
             <div className="flex-1 overflow-y-auto px-5">
-              <ShippingBar subtotal={subtotal} className="border-b border-border py-4" />
+              <ShippingBar subtotal={net} className="border-b border-border py-4" />
               <ul>
                 {lines.map((l) => (
                   <CartLineRow key={l.h + l.size} line={l} />
@@ -245,20 +313,9 @@ export function CartDrawer() {
               </div>
             </div>
             <div className="space-y-3 border-t border-border bg-white px-5 py-4">
-              <dl className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Subtotaal</dt>
-                  <dd>{money(subtotal)}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Verzending</dt>
-                  <dd>{shipping === 0 ? "Gratis" : money(shipping)}</dd>
-                </div>
-                <div className="flex justify-between pt-1 text-base font-bold">
-                  <dt>Totaal</dt>
-                  <dd>{money(total)}</dd>
-                </div>
-              </dl>
+              <PriceRows
+                price={{ subtotal, discount, bundle, hint: bundleHint, shipping, total }}
+              />
               <Link
                 to="/afrekenen"
                 onClick={() => setOpen(false)}

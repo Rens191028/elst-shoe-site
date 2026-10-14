@@ -320,64 +320,57 @@ function SearchDialog({
 const iconBtn =
   "relative flex h-9 w-9 items-center justify-center rounded-full text-ink transition hover:-translate-y-0.5 hover:bg-secondary active:scale-90 sm:h-10 sm:w-10";
 
-/** Winkelwagen: klapt bij het toevoegen kort uit tot een balk met aantal en totaal. */
+/**
+ * Winkelwagen: het icoon is er altijd. Zodra er items in zitten blijft er een balk met aantal en
+ * bedrag naast staan; bij toevoegen "popt" de knop even. Icoon en balk zijn één element, dus het
+ * icoon heeft altijd zijn eigen achtergrond en kan nooit verdwijnen.
+ */
 function CartButton() {
-  const { count, subtotal, addTick, setOpen } = useCart();
-  const [expanded, setExpanded] = useState(false);
+  const { count, net, addTick, setOpen } = useCart();
+  const [pop, setPop] = useState(false);
   const seen = useRef(addTick);
   useEffect(() => {
     if (addTick === seen.current) return;
     seen.current = addTick;
-    setExpanded(true);
-    const t = setTimeout(() => setExpanded(false), 2800);
+    setPop(true);
+    const t = setTimeout(() => setPop(false), 650);
     return () => clearTimeout(t);
   }, [addTick]);
 
-  const label = `${count} ${count === 1 ? "item" : "items"} · ${money(subtotal)}`;
-  // Het basisicoon (met aantal-badge) staat los van de uitklapbalk en blijft altijd zichtbaar.
-  // De balk schuift er alleen tijdelijk links van uit (clip-path), zonder het icoon te beïnvloeden.
+  const filled = count > 0;
+  const full = `${count} ${count === 1 ? "item" : "items"} · ${money(net)}`;
+  const short = `${count} · ${money(net)}`;
   return (
-    <div className="relative h-9 w-9 sm:h-10 sm:w-10">
-      <button
-        type="button"
-        tabIndex={-1}
-        aria-hidden="true"
-        onClick={() => setOpen(true)}
-        className={cn(
-          "absolute right-0 top-0 flex h-full items-center whitespace-nowrap rounded-full bg-cta pl-4 pr-10 text-xs font-semibold text-white shadow-lift transition-[clip-path] duration-300 ease-out motion-reduce:transition-none",
-          expanded
-            ? "[clip-path:inset(0_0_0_0)]"
-            : "pointer-events-none [clip-path:inset(0_0_0_100%)]",
-        )}
-      >
-        {label}
-      </button>
+    <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label={`Winkelwagen, ${label}`}
+        aria-label={`Winkelwagen, ${filled ? full : "leeg"}`}
         className={cn(
-          iconBtn,
-          "relative z-10 h-full w-full transition-colors",
-          expanded && "text-white hover:bg-transparent",
+          "relative flex h-9 items-center rounded-full transition-[background-color,color,box-shadow,padding] duration-300 sm:h-10",
+          filled
+            ? "bg-cta pl-3.5 text-white shadow-soft hover:brightness-110"
+            : "text-ink hover:bg-secondary active:scale-90",
+          pop && "cart-pop",
         )}
       >
-        <ShoppingBag className="h-5 w-5" />
-        {count > 0 && (
-          <span
-            className={cn(
-              "absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white ring-2 ring-background transition-opacity duration-200",
-              expanded && "opacity-0",
-            )}
-          >
-            {count}
-          </span>
-        )}
+        <span
+          className={cn(
+            "overflow-hidden whitespace-nowrap text-xs font-semibold transition-[max-width,opacity] duration-300 motion-reduce:transition-none",
+            filled ? "max-w-[220px] pr-1 opacity-100" : "max-w-0 opacity-0",
+          )}
+        >
+          <span className="sm:hidden">{short}</span>
+          <span className="hidden sm:inline">{full}</span>
+        </span>
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center sm:h-10 sm:w-10">
+          <ShoppingBag className="h-5 w-5" />
+        </span>
       </button>
       <span className="sr-only" role="status" aria-live="polite">
-        {expanded ? `Toegevoegd aan winkelwagen. ${label}` : ""}
+        {pop ? `Toegevoegd aan winkelwagen. ${full}` : ""}
       </span>
-    </div>
+    </>
   );
 }
 
@@ -405,6 +398,7 @@ function AccountButton() {
 
 export function Header() {
   const { user } = useAuth();
+  const { count: cartCount } = useCart();
   const { handles: favs } = useFavorites();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -485,7 +479,7 @@ export function Header() {
               <Menu className="h-5 w-5" />
             </button>
           </div>
-          <Logo />
+          <Logo compactOnMobile={cartCount > 0} />
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Hoofdmenu">
             {GROUPS.map((g) => (
               <div
@@ -530,6 +524,12 @@ export function Header() {
               className="px-4 py-2 text-[0.95rem] font-semibold text-primary-text"
             >
               <span className="link-underline">Sale</span>
+            </Link>
+            <Link
+              to="/cadeaubon"
+              className="hidden px-4 py-2 text-[0.95rem] font-semibold text-ink xl:block"
+            >
+              <span className="link-underline">Cadeaubon</span>
             </Link>
           </nav>
           <div className="flex items-center gap-0.5">
@@ -631,6 +631,13 @@ export function Header() {
               </Link>
             ))}
             <div className="space-y-1 px-3 py-4 text-sm">
+              <Link
+                to="/cadeaubon"
+                onClick={() => setMobileOpen(false)}
+                className="block py-2 font-medium"
+              >
+                Cadeaubon
+              </Link>
               <Link
                 to="/maatadvies"
                 onClick={() => setMobileOpen(false)}

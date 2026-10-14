@@ -7,7 +7,12 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - TanStack Start (React 19, file-routes in `src/routes`), Tailwind v4, shadcn/ui, Lovable-gekoppeld (geen git-history herschrijven).
 - **Geen Shopify**: geen koppeling, geen vermelding in code/copy. (Alleen de bestaande productfoto-URL's in de catalogus staan nog op het oude CDN; zie "Open punten".)
 - Catalogus: `src/data/products.json`, gegenereerd uit de xlsx met `python3 -I scripts/build-catalog.py <xlsx>` (normaliseert kleuren, categorieën en van-prijzen). Niet met de hand bewerken.
-- Winkelwagen: `src/lib/cart.tsx` (localStorage). Toevoegen opent de lade niet meer: de header-winkelwagen klapt kort uit tot een balk met aantal en totaal (`addTick`).
+- Winkelwagen: `src/lib/cart.tsx` (localStorage). Toevoegen opent de lade niet: de header-winkelwagen toont een permanente balk met aantal en totaal zolang er items zijn (en "popt" bij toevoegen via `addTick`); alleen een lege wagen toont het kale icoon. Bedragen komen uit `priceLines` (`src/lib/bundles.ts`).
+- Bundelkorting: regels in `BUNDLES` (`src/lib/bundles.ts`); nu 10% bij 2 paar schoenen buiten de sale. De voorwaarden zijn een voorstel: laat de winkelier bevestigen.
+- "Bestel nu" (kaart en productpagina) gaat naar `/afrekenen?direct=<handle>&maat=<maat>` en laat de winkelwagen ongemoeid.
+- Cadeaubon: virtueel product `cadeaubon-<bedrag>` (`src/lib/voucher.ts`, niet in de catalogus); de "maat" is voor wie de bon is. Pagina `/cadeaubon`. Levering per e-mail vraagt nog een backend.
+- Reviews per product: `src/data/reviews.json` (`{handle: [{name, stars, text, date?, photo?}]}`), nu leeg; nooit verzinnen. Foto-upload door klanten vraagt een database + opslag + moderatie.
+- Orderbevestigingsmail: `src/lib/emails/orderConfirmation.ts` (huisstijl-HTML + tekst), nog niet gekoppeld aan een mailservice.
 - Vergelijken (max 3) en "eerder bekeken": `src/lib/shopper.tsx` (localStorage, geen account nodig); UI in `components/site/shopper-ui.tsx`, pagina `/vergelijken`.
 - SEO: `public/sitemap.xml` genereren met `node scripts/build-sitemap.mjs` na elke catalogus-update (`src/test/seo.test.ts` bewaakt de dekking). Titels/descriptions via `seoTitle`/`seoDescription`; OG-afbeelding `public/og-image.png`.
 - Voorraad: `src/lib/stock.ts` leest `src/data/stock.json` (`{handle: {maat: aantal}}`). De catalogus heeft alleen ja/nee; zonder aangeleverde aantallen wordt nooit een aantal getoond.
@@ -43,6 +48,7 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - Mega-menu toont "Nieuw in …" i.p.v. "Populair in …" (geen verkoopdata).
 - Niet gebouwd uit het conversie-document, bewust: "X mensen bekeken dit"/"laatst besteld" (geen echte activiteitsdata; verzonnen cijfers zijn misleidend), track & trace (orders hebben geen vervoerder-/trackingvelden), verlaten-winkelwagen-mail en refer-a-friend (vragen een e-mailbackend), dark mode (nice to have).
 - "Retour aanvragen" in het account opent een voorgevuld e-mailtje (geen retourportaal).
+- Mobiel: onder 640px verbergt het logo zijn woordnaam zodra er items in de wagen zitten (ruimte voor de balk); op 320px breed loopt de header nog ~25px over.
 - Social-URL's invullen in `SITE.social`; ManyChat-widget nog niet geplaatst.
 - Productfoto's staan nog op het oude CDN: verhuizen naar eigen opslag; achtergrondverwerking pas na testbatch.
 - Data heeft één foto per product (geen hover-crossfade/swipe tussen foto's), geen verkoopdata (dus geen "Bestseller"-badge) en geen omschrijvingen (nu afgeleid uit titel).

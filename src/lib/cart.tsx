@@ -8,7 +8,8 @@ import {
   type ReactNode,
   type Context as ReactContext,
 } from "react";
-import { getProduct, shippingFor, type Product } from "@/lib/catalog";
+import { getProduct, type Product } from "@/lib/catalog";
+import { priceLines, type BundleRule } from "@/lib/bundles";
 
 export type CartLine = { h: string; size: string; qty: number };
 export type DetailedLine = CartLine & { product: Product };
@@ -16,7 +17,15 @@ export type DetailedLine = CartLine & { product: Product };
 type Ctx = {
   lines: DetailedLine[];
   count: number;
+  /** Som van de artikelen vóór bundelkorting. */
   subtotal: number;
+  /** Bundelkorting (0 als er geen korting is) en de regel die is toegepast. */
+  discount: number;
+  bundle: BundleRule | null;
+  /** Aanmoediging net onder de bundeldrempel, bijv. "Nog 1 paar erbij en je krijgt 10% korting". */
+  bundleHint: string | null;
+  /** Subtotaal na korting; hier hangt de gratis-verzendgrens aan. */
+  net: number;
   shipping: number;
   total: number;
   open: boolean;
@@ -92,14 +101,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const product = getProduct(l.h);
       return product ? [{ ...l, product }] : [];
     });
-    const subtotal = Math.round(lines.reduce((s, l) => s + l.product.p * l.qty, 0) * 100) / 100;
-    const shipping = shippingFor(subtotal);
+    const price = priceLines(lines);
     return {
       lines,
       count: lines.reduce((s, l) => s + l.qty, 0),
-      subtotal,
-      shipping,
-      total: Math.round((subtotal + shipping) * 100) / 100,
+      subtotal: price.subtotal,
+      discount: price.discount,
+      bundle: price.bundle,
+      bundleHint: price.hint,
+      net: price.net,
+      shipping: price.shipping,
+      total: price.total,
       open,
       addTick,
       setOpen,

@@ -11,7 +11,14 @@ export function LogoMark({ className }: { className?: string }) {
   );
 }
 
-export function Logo({ className }: { className?: string }) {
+/** `compactOnMobile`: onder 640px alleen het icoon (ruimte voor de winkelwagenbalk in de header). */
+export function Logo({
+  className,
+  compactOnMobile,
+}: {
+  className?: string;
+  compactOnMobile?: boolean;
+}) {
   return (
     <Link
       to="/"
@@ -19,7 +26,12 @@ export function Logo({ className }: { className?: string }) {
       className={cn("logo-link flex items-center gap-2 sm:gap-2.5", className)}
     >
       <LogoMark />
-      <span className="font-display text-[0.92rem] font-extrabold sm:text-[1.15rem] tracking-tight text-ink">
+      <span
+        className={cn(
+          "font-display text-[0.92rem] font-extrabold tracking-tight text-ink sm:text-[1.15rem]",
+          compactOnMobile && "max-sm:hidden",
+        )}
+      >
         GoedkopeSchoenen
       </span>
     </Link>

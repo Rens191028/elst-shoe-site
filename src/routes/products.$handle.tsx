@@ -1,5 +1,5 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Check, CreditCard, Link2, PackageCheck, Ruler, Truck } from "lucide-react";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { Check, CreditCard, Link2, PackageCheck, Tag, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Accordion,
@@ -19,6 +19,9 @@ import {
   SUBS,
 } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
+import { BUNDLES } from "@/lib/bundles";
+import { SizeChartButton } from "@/components/site/SizeChart";
+import { ProductReviews } from "@/components/site/reviews";
 import { useShopper } from "@/lib/shopper";
 import { CompareButton, RecentlyViewed } from "@/components/site/shopper-ui";
 import { LOW_STOCK, sizeStock } from "@/lib/stock";
@@ -133,7 +136,7 @@ const MATERIALS: [RegExp, string][] = [
 function ProductPage() {
   const { handle } = Route.useParams();
   const p = getProduct(handle)!;
-  const { add, subtotal } = useCart();
+  const { add, net } = useCart();
   const { markViewed } = useShopper();
   useEffect(() => markViewed(p.h), [p.h, markViewed]);
   const [size, setSize] = useState("");
@@ -147,12 +150,25 @@ function ProductPage() {
   const pct = discountPct(p);
   const together = related(p, 4);
 
-  const submit = () => {
+  const navigate = useNavigate();
+  const [added, setAdded] = useState(false);
+  const ready = () => {
     if (needsSize && !size) {
       setWarn(true);
-      return;
+      return false;
     }
+    return true;
+  };
+  const addToCart = () => {
+    if (!ready()) return;
     add(p.h, size);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1600);
+  };
+  // "Bestel nu": direct naar de checkout met alleen dit product
+  const buyNow = () => {
+    if (!ready()) return;
+    void navigate({ to: "/afrekenen", search: { direct: p.h, ...(size ? { maat: size } : {}) } });
   };
 
   const copy = async () => {
@@ -235,12 +251,15 @@ function ProductPage() {
             <fieldset className="mt-5">
               <div className="mb-2 flex items-center justify-between">
                 <legend className="text-sm font-semibold">Kies je maat</legend>
-                <Link
-                  to="/maatadvies"
-                  className="flex items-center gap-1 text-sm font-medium underline underline-offset-4 hover:text-primary"
-                >
-                  <Ruler className="h-4 w-4" /> Maatadvies
-                </Link>
+                <div className="flex items-center gap-4">
+                  <SizeChartButton available={p.m} />
+                  <Link
+                    to="/maatadvies"
+                    className="text-sm font-medium underline underline-offset-4 hover:text-primary-text"
+                  >
+                    Maatadvies
+                  </Link>
+                </div>
               </div>
               <div className="flex flex-wrap gap-2">
                 {p.m.map((m) => {
@@ -284,17 +303,46 @@ function ProductPage() {
             </fieldset>
           )}
 
-          <button
-            type="button"
-            onClick={submit}
-            disabled={!p.s}
-            className="group mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 font-semibold text-white shadow-[0_8px_20px_-10px_var(--primary)] transition duration-200 hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-[0_14px_26px_-12px_var(--primary)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-border disabled:text-muted-foreground disabled:shadow-none disabled:hover:translate-y-0"
-          >
-            {p.s ? "Aan winkelwagen toevoegen" : "Uitverkocht"}
-          </button>
+          {p.s ? (
+            <div className="mt-6 grid gap-2.5">
+              <button
+                type="button"
+                onClick={buyNow}
+                className="group flex h-14 w-full items-center justify-center gap-2 rounded-full bg-cta font-semibold text-white shadow-[0_8px_20px_-10px_var(--primary)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_26px_-12px_var(--primary)] active:scale-[0.98]"
+              >
+                Bestel nu
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </button>
+              <button
+                type="button"
+                onClick={addToCart}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-ink font-semibold text-ink transition hover:bg-ink hover:text-white active:scale-[0.98]"
+              >
+                {added ? <Check className="h-4 w-4" /> : null}
+                {added ? "Toegevoegd aan winkelwagen" : "Toevoegen aan winkelwagen"}
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="mt-6 h-14 w-full cursor-not-allowed rounded-full bg-border font-semibold text-muted-foreground"
+            >
+              Uitverkocht
+            </button>
+          )}
+
+          {p.g === "schoenen" && !p.w && (
+            <p className="mt-3 flex items-center gap-2 rounded-2xl bg-secondary px-4 py-2.5 text-sm">
+              <Tag className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+              <span>
+                <strong>{BUNDLES[0]!.title}.</strong> Geldt voor schoenen buiten de sale.
+              </span>
+            </p>
+          )}
 
           <ShippingBar
-            subtotal={subtotal + (p.s ? p.p : 0)}
+            subtotal={net + (p.s ? p.p : 0)}
             className="mt-5 rounded-2xl border border-border bg-white shadow-soft p-4"
           />
 
@@ -403,6 +451,8 @@ function ProductPage() {
           </div>
         </div>
       </article>
+
+      <ProductReviews handle={p.h} className="mx-auto max-w-7xl px-4 pt-14 lg:px-6" />
 
       {together.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 pt-10 lg:px-6" aria-labelledby="samen-h">

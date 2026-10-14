@@ -312,3 +312,44 @@
     animation: none;
   }
 }
+
+/* Winkelwagen bevestigt het toevoegen met een korte "pop" */
+@keyframes cartPop {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 45%, transparent);
+  }
+  35% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.98);
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary) 0%, transparent);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.cart-pop {
+  animation: cartPop 650ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cart-pop {
+    animation: none;
+  }
+}
+
+/* Sterren die vullen zodra hun Reveal-blok in beeld komt */
+.stars-fill {
+  width: 0;
+  transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1) 250ms;
+}
+.reveal.is-visible .stars-fill {
+  width: var(--w);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stars-fill {
+    width: var(--w);
+    transition: none;
+  }
+}

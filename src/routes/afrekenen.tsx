@@ -1,16 +1,27 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Info, Lock } from "lucide-react";
-import { useState } from "react";
-import { money } from "@/lib/catalog";
+import { useMemo, useState } from "react";
+import { getProduct, money, variantLabel } from "@/lib/catalog";
+import { priceLines } from "@/lib/bundles";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { KiyohBadge } from "@/components/site/product";
 import { SITE } from "@/lib/site";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Photo } from "@/components/site/product";
+import { PriceRows } from "@/components/site/cart";
 import { cn } from "@/lib/utils";
 
+type Search = { direct?: string | undefined; maat?: string | undefined };
+
 export const Route = createFileRoute("/afrekenen")({
+  validateSearch: (s: Record<string, unknown>): Search => ({
+    ...(typeof s["direct"] === "string" ? { direct: s["direct"].slice(0, 200) } : {}),
+    // Een getypte ?maat=39 wordt door de router als getal gelezen; accepteer beide
+    ...(typeof s["maat"] === "string" || typeof s["maat"] === "number"
+      ? { maat: String(s["maat"]).slice(0, 240) }
+      : {}),
+  }),
   head: () => ({
     meta: [{ title: "Afrekenen — GoedkopeSchoenen.com" }, { name: "robots", content: "noindex" }],
   }),
@@ -39,8 +50,21 @@ function Field({
 }
 
 function Checkout() {
-  const { lines, subtotal, shipping, total } = useCart();
+  const cart = useCart();
+  const { direct, maat } = Route.useSearch();
   const { user } = useAuth();
+
+  // "Bestel nu": één product rechtstreeks afrekenen, zonder de winkelwagen aan te raken
+  const directLines = useMemo(() => {
+    const product = direct ? getProduct(direct) : undefined;
+    if (!product || !product.s) return null;
+    if (product.m.length && !(maat && product.m.includes(maat))) return null;
+    return [{ h: product.h, size: maat ?? "", qty: 1, product }];
+  }, [direct, maat]);
+  const isDirect = directLines !== null;
+  const lines = directLines ?? cart.lines;
+  const price = isDirect ? priceLines(lines) : cart;
+  const digitalOnly = lines.length > 0 && lines.every((l) => l.product.g === "cadeaubon");
   const navigate = useNavigate();
   const [method, setMethod] = useState(METHODS[0]!);
 
@@ -61,12 +85,21 @@ function Checkout() {
   return (
     <>
       <Breadcrumbs
-        items={[{ label: "Winkelwagen" }, { label: "Afrekenen" }].map((c, i) =>
-          i === 0 ? { ...c } : c,
-        )}
+        items={
+          isDirect ? [{ label: "Afrekenen" }] : [{ label: "Winkelwagen" }, { label: "Afrekenen" }]
+        }
       />
       <section className="mx-auto max-w-7xl px-4 pb-8 pt-4 lg:px-6">
         <h1 className="font-display text-4xl font-extrabold tracking-tight">Afrekenen</h1>
+        {isDirect && (
+          <p className="mt-3 rounded-2xl bg-secondary px-4 py-3 text-sm">
+            Je bestelt alleen <strong>{lines[0]!.product.t}</strong>. Je winkelwagen blijft
+            ongewijzigd.{" "}
+            <Link to="/winkelwagen" className="font-semibold underline underline-offset-4">
+              Bekijk winkelwagen
+            </Link>
+          </p>
+        )}
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm">
           <p className="text-muted-foreground">
             {user ? (
@@ -103,12 +136,32 @@ function Checkout() {
           className="mt-8 grid gap-10 lg:grid-cols-[1fr_400px]"
           onSubmit={(e) => {
             e.preventDefault();
+            try {
+              sessionStorage.setItem(
+                "gs-last-order",
+                JSON.stringify({
+                  at: new Date().toISOString(),
+                  lines: lines.map((l) => ({ h: l.h, size: l.size, qty: l.qty })),
+                  price: {
+                    subtotal: price.subtotal,
+                    discount: price.discount,
+                    shipping: price.shipping,
+                    total: price.total,
+                  },
+                  digital: digitalOnly,
+                }),
+              );
+            } catch {
+              /* sessionStorage niet beschikbaar */
+            }
             void navigate({ to: "/bedankt" });
           }}
         >
           <div className="space-y-8">
             <fieldset className="grid gap-4 sm:grid-cols-2">
-              <legend className="mb-4 font-display text-xl font-bold">Contact & bezorgadres</legend>
+              <legend className="mb-4 font-display text-xl font-bold">
+                {digitalOnly ? "Contact" : "Contact & bezorgadres"}
+              </legend>
               <Field label="E-mailadres" className="sm:col-span-2">
                 <input required type="email" autoComplete="email" className={field} />
               </Field>
@@ -118,21 +171,25 @@ function Checkout() {
               <Field label="Achternaam">
                 <input required autoComplete="family-name" className={field} />
               </Field>
-              <Field label="Straat en huisnummer" className="sm:col-span-2">
-                <input required autoComplete="street-address" className={field} />
-              </Field>
-              <Field label="Postcode">
-                <input
-                  required
-                  autoComplete="postal-code"
-                  pattern="[1-9][0-9]{3}\s?[A-Za-z]{2}"
-                  title="Bijvoorbeeld 6662 MD"
-                  className={field}
-                />
-              </Field>
-              <Field label="Woonplaats">
-                <input required autoComplete="address-level2" className={field} />
-              </Field>
+              {!digitalOnly && (
+                <>
+                  <Field label="Straat en huisnummer" className="sm:col-span-2">
+                    <input required autoComplete="street-address" className={field} />
+                  </Field>
+                  <Field label="Postcode">
+                    <input
+                      required
+                      autoComplete="postal-code"
+                      pattern="[1-9][0-9]{3}\s?[A-Za-z]{2}"
+                      title="Bijvoorbeeld 6662 MD"
+                      className={field}
+                    />
+                  </Field>
+                  <Field label="Woonplaats">
+                    <input required autoComplete="address-level2" className={field} />
+                  </Field>
+                </>
+              )}
               <Field label="Telefoon (optioneel)" className="sm:col-span-2">
                 <input type="tel" autoComplete="tel" className={field} />
               </Field>
@@ -180,28 +237,14 @@ function Checkout() {
                   <div className="min-w-0 flex-1 text-sm">
                     <p className="line-clamp-2 font-medium leading-snug">{l.product.t}</p>
                     <p className="text-xs text-muted-foreground">
-                      {l.size ? `Maat ${l.size} · ` : ""}
-                      {l.qty}×
+                      {variantLabel(l.product, l.size)} · {l.qty}×
                     </p>
                   </div>
                   <p className="text-sm font-semibold">{money(l.product.p * l.qty)}</p>
                 </li>
               ))}
             </ul>
-            <dl className="space-y-2 border-t border-border pt-4 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Subtotaal</dt>
-                <dd>{money(subtotal)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Verzending</dt>
-                <dd>{shipping === 0 ? "Gratis" : money(shipping)}</dd>
-              </div>
-              <div className="flex justify-between border-t border-border pt-3 text-lg font-bold">
-                <dt>Totaal</dt>
-                <dd>{money(total)}</dd>
-              </div>
-            </dl>
+            <PriceRows big className="border-t border-border pt-4" price={price} />
             <button
               type="submit"
               className="flex w-full items-center justify-center gap-2 rounded-full bg-cta py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]"
