@@ -21,6 +21,7 @@ import { RippleInit, ScrollProgress } from "@/components/site/motion-extras";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/cart";
+import { ExitIntent } from "@/components/site/ExitIntent";
 import { ShopAssistant } from "@/components/site/ShopAssistant";
 
 function NotFoundComponent() {
@@ -178,6 +179,7 @@ function RootComponent() {
               <Footer />
               <CartDrawer />
               <CompareTray />
+              <ExitIntent />
               <ShopAssistant />
             </CartProvider>
           </ShopperProvider>

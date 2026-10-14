@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Scale, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getProduct, type Product } from "@/lib/catalog";
+import { getCollection, getProduct, related, type Product } from "@/lib/catalog";
+import { useFavorites } from "@/lib/favorites";
 import { MAX_COMPARE, useShopper } from "@/lib/shopper";
 import { Photo, ProductGrid } from "@/components/site/product";
 import { cn } from "@/lib/utils";
@@ -92,6 +93,30 @@ export function RecentlyViewed({ exclude, className }: { exclude?: string; class
     <section className={className} aria-labelledby="recent-h">
       <h2 id="recent-h" className="mb-6 font-display text-2xl tracking-tight md:text-3xl">
         Eerder bekeken
+      </h2>
+      <ProductGrid products={items} />
+    </section>
+  );
+}
+
+/**
+ * "Omdat je … bekeek": aanbevelingen uit dezelfde categorie als wat je laatst bekeek (of, als
+ * je bent ingelogd en nog niets bekeek, als je laatste favoriet). Alleen lokale/eigen gegevens;
+ * zonder geschiedenis tonen we niets.
+ */
+export function PersonalPicks({ className }: { className?: string }) {
+  const { recent } = useShopper();
+  const { handles } = useFavorites();
+  const seed = getProduct(recent[0] ?? "") ?? getProduct(handles[handles.length - 1] ?? "");
+  if (!seed) return null;
+  const items = related(seed, 4, recent);
+  if (items.length === 0) return null;
+  const cat = (getCollection(seed.c)?.title ?? "dit").toLowerCase();
+  const fromFav = !getProduct(recent[0] ?? "");
+  return (
+    <section className={className} aria-labelledby="picks-h">
+      <h2 id="picks-h" className="mb-6 font-display text-2xl tracking-tight md:text-3xl">
+        {fromFav ? `Omdat je ${cat} bewaarde` : `Omdat je ${cat} bekeek`}
       </h2>
       <ProductGrid products={items} />
     </section>

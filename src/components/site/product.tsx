@@ -86,7 +86,41 @@ export function Price({ product, size = "md" }: { product: Product; size?: "md" 
   );
 }
 
-export function Badges({ product }: { product: Product }) {
+/** Sale-prijs: oude prijs wordt doorgestreept zodra hij in beeld komt, nieuwe prijs springt eruit. */
+export function SalePrice({ product }: { product: Product }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") return setOn(true);
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e?.isIntersecting) {
+          setOn(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.8 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-2.5">
+      <span className="font-display text-2xl font-extrabold text-primary">{money(product.p)}</span>
+      {product.w && (
+        <span ref={ref} className="text-sm text-soft">
+          <span className="sr-only">Van-prijs </span>
+          <span className="strike" data-on={on}>
+            {money(product.w)}
+          </span>
+        </span>
+      )}
+    </div>
+  );
+}
+
+export function Badges({ product, sale }: { product: Product; sale?: boolean }) {
   const pct = discountPct(product);
   return (
     <div className="flex flex-col items-start gap-1.5">
@@ -96,7 +130,14 @@ export function Badges({ product }: { product: Product }) {
         </span>
       )}
       {product.s && pct > 0 && (
-        <span className="badge-pulse rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold text-white">
+        <span
+          className={cn(
+            "bg-primary font-bold text-white",
+            sale
+              ? "sale-badge rounded-md px-3 py-1.5 font-display text-xl font-extrabold"
+              : "badge-pulse rounded-full px-2.5 py-1 text-[11px]",
+          )}
+        >
           -{pct}%
         </span>
       )}
@@ -127,7 +168,7 @@ export function WishButton({ handle, className }: { handle: string; className?: 
       aria-pressed={on}
       aria-label={on ? "Verwijder van favorieten" : "Bewaar als favoriet"}
       className={cn(
-        "flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-ink shadow-sm transition active:scale-90 hover:-translate-y-0.5",
+        "flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[#141413] shadow-sm transition active:scale-90 hover:-translate-y-0.5",
         className,
       )}
     >
@@ -227,11 +268,13 @@ export function ProductCard({
   index = 0,
   eager,
   view = "grid",
+  sale,
 }: {
   product: Product;
   index?: number;
   eager?: boolean;
   view?: "grid" | "list";
+  sale?: boolean;
 }) {
   const list = view === "list";
 
@@ -270,7 +313,7 @@ export function ProductCard({
           />
         </Link>
         <div className="pointer-events-none absolute left-2.5 top-2.5">
-          <Badges product={product} />
+          <Badges product={product} sale={!!sale} />
         </div>
         <WishButton handle={product.h} className="absolute right-2.5 top-2.5" />
       </div>
@@ -285,9 +328,14 @@ export function ProductCard({
             {product.t}
           </Link>
         </h3>
-        <Price product={product} />
+        {sale && product.w ? <SalePrice product={product} /> : <Price product={product} />}
         {lowStock(product) !== undefined && (
-          <p className="text-xs font-semibold text-primary-text">
+          <p
+            className={cn(
+              "text-xs font-semibold text-primary-text",
+              sale && "inline-block rounded-full bg-primary px-2.5 py-1 text-white",
+            )}
+          >
             {lowStockLabel(lowStock(product)!)}
           </p>
         )}
@@ -349,10 +397,12 @@ export function ProductGrid({
   products,
   eagerCount = 0,
   view = "grid",
+  sale,
 }: {
   products: Product[];
   eagerCount?: number;
   view?: "grid" | "list";
+  sale?: boolean;
 }) {
   return (
     <div
@@ -364,7 +414,7 @@ export function ProductGrid({
     >
       {products.map((p, i) => (
         <Reveal key={p.h} index={i % 4}>
-          <ProductCard product={p} index={i} eager={i < eagerCount} view={view} />
+          <ProductCard product={p} index={i} eager={i < eagerCount} view={view} sale={!!sale} />
         </Reveal>
       ))}
     </div>

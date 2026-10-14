@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { Check, CreditCard, Link2, PackageCheck, Tag, Truck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -26,6 +26,7 @@ import { useShopper } from "@/lib/shopper";
 import { flyToCart } from "@/lib/fly";
 import { CompareButton, RecentlyViewed } from "@/components/site/shopper-ui";
 import { LOW_STOCK, sizeStock } from "@/lib/stock";
+import { StockAlert } from "@/components/site/StockAlert";
 import { SITE } from "@/lib/site";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { ShippingBar } from "@/components/site/cart";
@@ -167,9 +168,26 @@ function ProductPage() {
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);
   };
+  // Mobiel: vaste "Bestel nu"-balk zodra de gewone knoppen uit beeld zijn
+  const buyRef = useRef<HTMLDivElement>(null);
+  const [showBar, setShowBar] = useState(false);
+  useEffect(() => {
+    const el = buyRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setShowBar(!!e && !e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, [p.h]);
+
   // "Bestel nu": direct naar de checkout met alleen dit product
   const buyNow = () => {
-    if (!ready()) return;
+    if (!ready()) {
+      // Zonder gekozen maat: breng de maatkeuze in beeld zodat de melding zichtbaar is
+      document
+        .getElementById("maat-keuze")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     void navigate({ to: "/afrekenen", search: { direct: p.h, ...(size ? { maat: size } : {}) } });
   };
 
@@ -253,7 +271,7 @@ function ProductPage() {
           )}
 
           {needsSize && (
-            <fieldset className="mt-5">
+            <fieldset id="maat-keuze" className="mt-5 scroll-mt-28">
               <div className="mb-2 flex items-center justify-between">
                 <legend className="text-sm font-semibold">Kies je maat</legend>
                 <div className="flex items-center gap-4">
@@ -309,7 +327,7 @@ function ProductPage() {
           )}
 
           {p.s ? (
-            <div className="mt-6 grid gap-2.5">
+            <div ref={buyRef} className="mt-6 grid gap-2.5">
               <button
                 type="button"
                 onClick={buyNow}
@@ -328,13 +346,16 @@ function ProductPage() {
               </button>
             </div>
           ) : (
-            <button
-              type="button"
-              disabled
-              className="mt-6 h-14 w-full cursor-not-allowed rounded-full bg-border font-semibold text-muted-foreground"
-            >
-              Uitverkocht
-            </button>
+            <div className="mt-6 space-y-3">
+              <button
+                type="button"
+                disabled
+                className="h-14 w-full cursor-not-allowed rounded-full bg-border font-semibold text-muted-foreground"
+              >
+                Uitverkocht
+              </button>
+              <StockAlert product={p} />
+            </div>
           )}
 
           {p.g === "schoenen" && !p.w && (
@@ -469,6 +490,29 @@ function ProductPage() {
           </h2>
           <ProductGrid products={together} />
         </section>
+      )}
+      {p.s && (
+        <div
+          data-sticky-buy
+          aria-hidden={!showBar}
+          className={cn(
+            "fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-border bg-background/95 py-3 pl-4 pr-24 backdrop-blur transition-transform duration-300 md:hidden",
+            showBar ? "translate-y-0" : "translate-y-full",
+          )}
+        >
+          <div className="min-w-0 flex-1 leading-tight">
+            <p className="truncate text-xs text-muted-foreground">{p.t}</p>
+            <Price product={p} />
+          </div>
+          <button
+            type="button"
+            tabIndex={showBar ? 0 : -1}
+            onClick={buyNow}
+            className="h-12 shrink-0 rounded-full bg-cta px-6 font-semibold text-white active:scale-[0.97]"
+          >
+            Bestel nu
+          </button>
+        </div>
       )}
       <RecentlyViewed exclude={p.h} className="mx-auto max-w-7xl px-4 pt-14 lg:px-6" />
     </>

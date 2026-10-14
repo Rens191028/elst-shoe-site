@@ -1,3 +1,4 @@
+import { shippingCutoff } from "@/lib/cutoff";
 import { describe, expect, it } from "vitest";
 import { BUNDLES, priceLines } from "@/lib/bundles";
 import { PRODUCTS, getProduct, variantLabel } from "@/lib/catalog";
@@ -59,7 +60,7 @@ describe("cadeaubon", () => {
   });
 
   it("toont voor wie de bon is in plaats van een maat", () => {
-    const v = voucherVariant("Anna", "anna@example.nl", "Veel plezier!");
+    const v = voucherVariant("Anna", "Veel plezier!");
     expect(variantLabel(voucherProduct(25), v)).toContain("Anna");
     expect(variantLabel(shoe(0), "38")).toBe("Maat 38");
   });
@@ -80,5 +81,19 @@ describe("maten en e-mail", () => {
     expect(mail.html).not.toContain("<script>");
     expect(mail.html).toContain("AB12CD34");
     expect(mail.text).toContain("Totaal");
+  });
+});
+
+describe("verzendbelofte", () => {
+  const at = (iso: string) => shippingCutoff(new Date(iso));
+  it("telt af tot 15:00 Nederlandse tijd op werkdagen", () => {
+    // di 13 okt 2026, 12:00 UTC = 14:00 in Amsterdam (zomertijd) → nog 1 uur
+    expect(at("2026-10-13T12:00:00Z")).toEqual({ open: true, secondsLeft: 3600 });
+  });
+  it("verzendt na 15:00 morgen, en na vrijdag 15:00 of in het weekend maandag", () => {
+    expect(at("2026-10-13T14:00:00Z")).toEqual({ open: false, shipsOn: "morgen" });
+    expect(at("2026-10-16T14:00:00Z")).toEqual({ open: false, shipsOn: "maandag" });
+    expect(at("2026-10-17T09:00:00Z")).toEqual({ open: false, shipsOn: "maandag" });
+    expect(at("2026-10-18T09:00:00Z")).toEqual({ open: false, shipsOn: "maandag" });
   });
 });

@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, Mail, PackageCheck, Truck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PriceRows } from "@/components/site/cart";
 import { Photo } from "@/components/site/product";
 import { getProduct, variantLabel, type Product } from "@/lib/catalog";
+import { VoucherActions, VoucherCard } from "@/components/site/VoucherCard";
 import { SITE } from "@/lib/site";
+import { generateVoucherCode, parseVoucherHandle, parseVoucherVariant } from "@/lib/voucher";
 
 export const Route = createFileRoute("/bedankt")({
   head: () => ({
@@ -41,6 +43,23 @@ function Thanks() {
     const product = getProduct(l.h);
     return product ? [{ ...l, product }] : [];
   });
+  // Een code tonen we alleen als bestellen echt live is: anders zou hij nergens gelden.
+  const vouchers = useMemo(
+    () =>
+      (snap?.lines ?? []).flatMap((l) => {
+        const amount = parseVoucherHandle(l.h);
+        if (amount === null) return [];
+        const { to, message } = parseVoucherVariant(l.size);
+        return Array.from({ length: l.qty }, (_, i) => ({
+          key: `${l.h}-${i}`,
+          amount,
+          to,
+          message,
+          code: SITE.checkoutLive ? generateVoucherCode() : undefined,
+        }));
+      }),
+    [snap],
+  );
   const steps = [
     {
       icon: Mail,
@@ -51,7 +70,7 @@ function Thanks() {
       ? {
           icon: PackageCheck,
           title: "Cadeaubon onderweg",
-          text: "We sturen de cadeaubon per e-mail naar de ontvanger.",
+          text: "Jij ontvangt de cadeaubon per e-mail en kunt hem hieronder downloaden of printen.",
         }
       : {
           icon: PackageCheck,
@@ -117,6 +136,23 @@ function Thanks() {
           </li>
         ))}
       </ol>
+
+      {vouchers.length > 0 && (
+        <div className="mt-10 space-y-8">
+          {vouchers.map((v) => (
+            <div key={v.key} className="space-y-4">
+              <VoucherCard amount={v.amount} to={v.to} message={v.message} code={v.code} />
+              {v.code ? (
+                <VoucherActions amount={v.amount} to={v.to} message={v.message} code={v.code} />
+              ) : (
+                <p className="text-center text-sm text-muted-foreground">
+                  Je unieke code verschijnt hier (en in je e-mail) zodra de betaling is gelukt.
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {snap && lines.length > 0 && (
         <div

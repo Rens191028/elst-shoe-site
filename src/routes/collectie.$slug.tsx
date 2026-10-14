@@ -22,6 +22,7 @@ import {
 import { SITE } from "@/lib/site";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { KiyohBadge, ProductGrid } from "@/components/site/product";
+import { SaleHero, SaleUgc } from "@/components/site/SaleHero";
 import { cn } from "@/lib/utils";
 
 type Search = {
@@ -35,7 +36,7 @@ const SORTS: { v: Sort; l: string }[] = [
   { v: "nieuw", l: "Nieuwste eerst" },
   { v: "prijs-oplopend", l: "Prijs: laag naar hoog" },
   { v: "prijs-aflopend", l: "Prijs: hoog naar laag" },
-  { v: "korting", l: "Meeste korting" },
+  { v: "korting", l: "Hoogste korting eerst" },
 ];
 
 const SEO: Record<string, string> = {
@@ -138,7 +139,9 @@ function CollectionPage() {
   const collection = getCollection(slug)!;
   const base = useMemo(() => inCollection(collection), [collection]);
   const fac = useMemo(() => facets(base), [base]);
-  const list = useMemo(() => applyFilters(base, search), [base, search]);
+  const isSale = slug === "sale";
+  const sort: Sort = search.sort ?? (isSale ? "korting" : "nieuw");
+  const list = useMemo(() => applyFilters(base, { ...search, sort }), [base, search, sort]);
 
   const set = (patch: Partial<Search>) => {
     setShown(PAGE);
@@ -162,10 +165,16 @@ function CollectionPage() {
   ];
 
   return (
-    <>
+    <div className={isSale ? "sale-theme" : undefined}>
       <Breadcrumbs items={crumbs} />
+      {isSale && <SaleHero count={base.length} />}
       <section className="mx-auto max-w-7xl px-4 pb-6 pt-4 lg:px-6">
-        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div
+          className={cn(
+            "flex flex-col justify-between gap-4 md:flex-row md:items-end",
+            isSale && "hidden",
+          )}
+        >
           <div>
             <h1 className="font-display text-4xl font-extrabold tracking-tight md:text-5xl">
               {collection.title}
@@ -262,7 +271,7 @@ function CollectionPage() {
             <label className="flex items-center gap-2 text-sm">
               <span className="sr-only sm:not-sr-only text-muted-foreground">Sorteren</span>
               <select
-                value={search.sort ?? "nieuw"}
+                value={sort}
                 onChange={(e) => set({ sort: e.target.value as Sort })}
                 className="h-10 rounded-full border border-border bg-white px-3 text-sm font-medium"
               >
@@ -314,7 +323,7 @@ function CollectionPage() {
               </button>
             </div>
           ) : (
-            <ProductGrid products={list.slice(0, shown)} eagerCount={4} view={view} />
+            <ProductGrid products={list.slice(0, shown)} eagerCount={4} view={view} sale={isSale} />
           )}
           {list.length > shown && (
             <div className="mt-12 text-center">
@@ -332,6 +341,7 @@ function CollectionPage() {
           )}
         </div>
 
+        {isSale && <SaleUgc />}
         {SEO[slug] && (
           <div className="mx-auto mt-20 max-w-3xl border-t border-border pt-10 text-sm leading-relaxed text-muted-foreground">
             <h2 className="mb-2 font-display text-lg font-bold text-ink">
@@ -448,7 +458,7 @@ function CollectionPage() {
           </div>
         </SheetContent>
       </Sheet>
-    </>
+    </div>
   );
 }
 
