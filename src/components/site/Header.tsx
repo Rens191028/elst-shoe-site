@@ -9,7 +9,17 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { countIn, GROUPS, inCollection, money, searchProducts, SUBS } from "@/lib/catalog";
+import {
+  countIn,
+  discountPct,
+  getCollection,
+  GROUPS,
+  inCollection,
+  money,
+  PRODUCTS,
+  searchProducts,
+  SUBS,
+} from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { useFavorites } from "@/lib/favorites";
@@ -29,12 +39,22 @@ const MEGA: Record<string, MenuColumn[]> = {
   accessoires: [{ title: "Accessoires", items: ["portemonnees", "sieraden"] }],
 };
 
+const MAX_SALE_PCT = Math.max(...PRODUCTS.map(discountPct));
+const NEW_COUNT = inCollection(getCollection("nieuw")!).length;
+const MESSAGES = [
+  ANNOUNCEMENTS[0]!,
+  `Sale: tot -${MAX_SALE_PCT}% korting op ${countIn("sale")} producten`,
+  ANNOUNCEMENTS[1]!,
+  `Nieuw binnen: ${NEW_COUNT} nieuwe producten in onze collectie`,
+  ANNOUNCEMENTS[2]!,
+];
+
 function Announcement() {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   useEffect(() => {
     if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setI((x) => (x + 1) % ANNOUNCEMENTS.length), 5000);
+    const t = setInterval(() => setI((x) => (x + 1) % MESSAGES.length), 5000);
     return () => clearInterval(t);
   }, [paused]);
   return (
@@ -48,7 +68,7 @@ function Announcement() {
         className="anim-fade-up mx-auto max-w-7xl px-4 py-2 text-center text-xs font-medium tracking-wide"
         aria-live="off"
       >
-        {ANNOUNCEMENTS[i]}
+        {MESSAGES[i]}
       </p>
     </div>
   );
@@ -56,7 +76,9 @@ function Announcement() {
 
 function MegaPanel({ slug, onNavigate }: { slug: string; onNavigate: () => void }) {
   const group = GROUPS.find((g) => g.slug === slug)!;
-  const feature = useMemo(() => inCollection(group).find((p) => p.s), [group]);
+  const fresh = useMemo(() => inCollection(group).filter((p) => p.s), [group]);
+  const feature = fresh[0];
+  const row = fresh.slice(1, 5);
   return (
     <div className="menu-panel absolute inset-x-0 top-full border-b border-border bg-background shadow-[0_24px_40px_-24px_rgba(20,20,19,0.25)]">
       <div className="mx-auto grid max-w-7xl grid-cols-[1fr_280px] gap-10 px-6 py-8">
@@ -86,6 +108,35 @@ function MegaPanel({ slug, onNavigate }: { slug: string; onNavigate: () => void 
               </ul>
             </div>
           ))}
+          {row.length > 0 && (
+            <div className="col-span-3 mt-2">
+              <p className="mb-3 text-xs font-bold uppercase tracking-widest text-soft">
+                Nieuw in {group.title.toLowerCase()}
+              </p>
+              <div className="grid grid-cols-4 gap-3">
+                {row.map((p) => (
+                  <Link
+                    key={p.h}
+                    to="/products/$handle"
+                    params={{ handle: p.h }}
+                    onClick={onNavigate}
+                    className="group block"
+                  >
+                    <span className="block aspect-[4/3] overflow-hidden rounded-xl bg-secondary">
+                      <Photo
+                        product={p}
+                        width={240}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        sizes="120px"
+                      />
+                    </span>
+                    <span className="mt-1.5 line-clamp-1 block text-xs font-medium">{p.t}</span>
+                    <span className="text-xs text-muted-foreground">{money(p.p)}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="col-span-3 mt-2 flex gap-5 border-t border-border pt-4 text-sm">
             <Link
               to="/collectie/$slug"
@@ -263,18 +314,104 @@ function SearchDialog({
   );
 }
 
+const iconBtn =
+  "relative flex h-9 w-9 items-center justify-center rounded-full text-ink transition hover:-translate-y-0.5 hover:bg-secondary active:scale-90 sm:h-10 sm:w-10";
+
+/** Winkelwagen: klapt bij het toevoegen kort uit tot een balk met aantal en totaal. */
+function CartButton() {
+  const { count, subtotal, addTick, setOpen } = useCart();
+  const [expanded, setExpanded] = useState(false);
+  const seen = useRef(addTick);
+  useEffect(() => {
+    if (addTick === seen.current) return;
+    seen.current = addTick;
+    setExpanded(true);
+    const t = setTimeout(() => setExpanded(false), 2800);
+    return () => clearTimeout(t);
+  }, [addTick]);
+
+  const label = `${count} ${count === 1 ? "item" : "items"} · ${money(subtotal)}`;
+  return (
+    <div className="relative h-9 w-9 sm:h-10 sm:w-10">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={`Winkelwagen, ${label}`}
+        className={cn(
+          "absolute right-0 top-0 z-10 flex h-full items-center justify-end overflow-hidden rounded-full text-ink transition-[max-width,background-color,color,box-shadow] duration-300 ease-out motion-reduce:transition-none",
+          expanded
+            ? "max-w-[240px] bg-cta pl-4 text-white shadow-lift"
+            : "max-w-9 hover:bg-secondary sm:max-w-10",
+        )}
+      >
+        <span
+          className={cn(
+            "whitespace-nowrap text-xs font-semibold transition-opacity duration-200",
+            expanded ? "pr-1.5 opacity-100" : "w-0 opacity-0",
+          )}
+        >
+          {label}
+        </span>
+        <span className="relative flex h-9 w-9 shrink-0 items-center justify-center sm:h-10 sm:w-10">
+          <ShoppingBag className="h-5 w-5" />
+          {count > 0 && !expanded && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white">
+              {count}
+            </span>
+          )}
+        </span>
+      </button>
+      <span className="sr-only" role="status" aria-live="polite">
+        {expanded ? `Toegevoegd aan winkelwagen. ${label}` : ""}
+      </span>
+    </div>
+  );
+}
+
+/** Account: outline-icoon, of de initiaal van de ingelogde klant. */
+function AccountButton() {
+  const { user } = useAuth();
+  const name = (user?.user_metadata?.["full_name"] as string | undefined) || user?.email || "";
+  const initial = name.trim().charAt(0).toUpperCase();
+  return (
+    <Link
+      to={user ? "/account" : "/inloggen"}
+      className={iconBtn}
+      aria-label={user ? `Mijn account (${name})` : "Inloggen"}
+    >
+      {user && initial ? (
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink font-display text-sm font-bold text-white">
+          {initial}
+        </span>
+      ) : (
+        <User className="h-5 w-5" />
+      )}
+    </Link>
+  );
+}
+
 export function Header() {
-  const { count, setOpen } = useCart();
   const { user } = useAuth();
   const { handles: favs } = useFavorites();
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [menu, setMenu] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Sticky, maar slim: weg bij naar beneden scrollen, terug bij omhoog scrollen
+  const lastY = useRef(0);
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 40);
+    lastY.current = window.scrollY;
+    const on = () => {
+      const y = window.scrollY;
+      setScrolled(y > 40);
+      const dy = y - lastY.current;
+      if (y < 160 || dy < -6) setHidden(false);
+      else if (dy > 6) setHidden(true);
+      if (Math.abs(dy) > 6) lastY.current = y;
+    };
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
@@ -294,15 +431,13 @@ export function Header() {
     closeTimer.current = setTimeout(() => setMenu(null), 140);
   };
 
-  const iconBtn =
-    "relative flex h-9 w-9 items-center justify-center rounded-full sm:h-10 sm:w-10 text-ink transition hover:-translate-y-0.5 hover:bg-secondary active:scale-90";
-
   return (
     <>
       <Announcement />
       <header
         className={cn(
-          "sticky top-0 z-40 border-b transition-all duration-[260ms]",
+          "sticky top-0 z-40 border-b transition-[transform,background-color,box-shadow,border-color] duration-[260ms] focus-within:translate-y-0",
+          hidden && !menu && !searchOpen && !mobileOpen && "-translate-y-full",
           scrolled
             ? "border-border bg-background/85 shadow-sm backdrop-blur-md"
             : "border-transparent bg-background",
@@ -364,7 +499,16 @@ export function Header() {
           <div className="flex items-center gap-0.5">
             <button
               type="button"
-              className={iconBtn}
+              onClick={() => setSearchOpen(true)}
+              aria-label="Zoeken"
+              className="mr-2 hidden h-10 w-56 items-center gap-2 rounded-full border border-border bg-white px-4 text-left text-sm text-soft transition hover:border-ink xl:flex"
+            >
+              <Search className="h-4 w-4 shrink-0" />
+              Zoek producten…
+            </button>
+            <button
+              type="button"
+              className={cn(iconBtn, "xl:hidden")}
               aria-label="Zoeken"
               onClick={() => setSearchOpen(true)}
             >
@@ -380,26 +524,8 @@ export function Header() {
                 <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
               )}
             </Link>
-            <Link
-              to={user ? "/account" : "/inloggen"}
-              className={iconBtn}
-              aria-label={user ? "Mijn account" : "Inloggen"}
-            >
-              <User className={cn("h-5 w-5", user && "fill-ink")} />
-            </Link>
-            <button
-              type="button"
-              className={iconBtn}
-              aria-label={`Winkelwagen, ${count} artikelen`}
-              onClick={() => setOpen(true)}
-            >
-              <ShoppingBag className="h-5 w-5" />
-              {count > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white">
-                  {count}
-                </span>
-              )}
-            </button>
+            <CartButton />
+            <AccountButton />
           </div>
         </div>
         {menu && MEGA[menu] && (

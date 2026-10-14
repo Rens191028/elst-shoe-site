@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { discountPct, getCollection, getProduct, img, related, SUBS, money } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
+import { LOW_STOCK, sizeStock } from "@/lib/stock";
 import { SITE } from "@/lib/site";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { ShippingBar } from "@/components/site/cart";
@@ -203,26 +204,38 @@ function ProductPage() {
                 </Link>
               </div>
               <div className="flex flex-wrap gap-2">
-                {p.m.map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    disabled={!p.s}
-                    aria-pressed={size === m}
-                    onClick={() => {
-                      setSize(m);
-                      setWarn(false);
-                    }}
-                    className={cn(
-                      "h-12 min-w-12 rounded-lg border px-3 text-sm font-semibold transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40",
-                      size === m
-                        ? "border-ink bg-ink text-white"
-                        : "border-border bg-white hover:border-ink",
-                    )}
-                  >
-                    {m}
-                  </button>
-                ))}
+                {p.m.map((m) => {
+                  const left = sizeStock(p, m); // alleen bekend als er voorraaddata is aangeleverd
+                  const out = !p.s || left === 0;
+                  return (
+                    <div key={m} className="flex flex-col items-center gap-1">
+                      <button
+                        type="button"
+                        disabled={out}
+                        aria-pressed={size === m}
+                        aria-label={`Maat ${m}${out ? ", uitverkocht" : left !== undefined && left <= LOW_STOCK ? `, nog ${left} op voorraad` : ""}`}
+                        onClick={() => {
+                          setSize(m);
+                          setWarn(false);
+                        }}
+                        className={cn(
+                          "h-12 min-w-12 rounded-lg border px-3 text-sm font-semibold transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40",
+                          out && "line-through",
+                          size === m
+                            ? "border-ink bg-ink text-white"
+                            : "border-border bg-white hover:border-ink",
+                        )}
+                      >
+                        {m}
+                      </button>
+                      {left !== undefined && left > 0 && left <= LOW_STOCK && (
+                        <span className="text-[11px] font-semibold leading-none text-primary">
+                          nog {left}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               {warn && (
                 <p role="alert" className="mt-2 text-sm font-medium text-primary">

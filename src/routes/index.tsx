@@ -23,6 +23,8 @@ import {
 import { REVIEWS, SITE, UGC } from "@/lib/site";
 import { CountUp, Reveal } from "@/components/site/motion";
 import { Tilt } from "@/components/site/Tilt";
+import { HeroProduct } from "@/components/site/HeroProduct";
+import { Deco3D, Floaty } from "@/components/site/decor";
 import { KiyohBadge, Photo, ProductCard } from "@/components/site/product";
 import { cn } from "@/lib/utils";
 
@@ -209,39 +211,8 @@ function Index() {
             </ul>
           </div>
 
-          <div
-            className="anim-fade-up relative mx-auto w-full max-w-md"
-            style={{ "--i": 2 } as React.CSSProperties}
-          >
-            <Tilt>
-              <Link
-                to="/products/$handle"
-                params={{ handle: HERO_PRODUCT.h }}
-                className="hero-surface relative block aspect-[4/5] overflow-hidden rounded-[28px] shadow-[0_30px_50px_-24px_rgba(20,20,19,0.35)]"
-                aria-label={`Bekijk ${HERO_PRODUCT.t}`}
-              >
-                <Photo
-                  product={HERO_PRODUCT}
-                  width={800}
-                  eager
-                  className="h-full w-full object-cover"
-                  sizes="(min-width:1024px) 440px, 90vw"
-                />
-              </Link>
-              <div className="absolute -left-4 bottom-8 hidden rounded-2xl bg-white px-4 py-3 shadow-xl [transform:translateZ(60px)] sm:block">
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-soft">Nu</p>
-                <p className="font-display text-xl font-extrabold text-primary">
-                  {money(HERO_PRODUCT.p)}
-                </p>
-                {HERO_PRODUCT.w && (
-                  <p className="text-xs text-soft line-through">{money(HERO_PRODUCT.w)}</p>
-                )}
-              </div>
-              <div className="absolute -right-3 top-8 hidden items-center gap-2 rounded-2xl bg-ink px-4 py-3 text-white shadow-xl [transform:translateZ(80px)] sm:flex">
-                <Truck className="h-4 w-4" />
-                <span className="text-xs font-semibold">Vandaag nog verzonden</span>
-              </div>
-            </Tilt>
+          <div className="anim-fade-up" style={{ "--i": 2 } as React.CSSProperties}>
+            <HeroProduct product={HERO_PRODUCT} />
           </div>
         </div>
       </section>
@@ -261,36 +232,38 @@ function Index() {
                     i === 0 && "lg:col-span-2 lg:row-span-2",
                   )}
                 >
-                  <Link
-                    to="/collectie/$slug"
-                    params={{ slug: r.slug }}
-                    className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-secondary shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-lift lg:aspect-auto lg:h-full"
-                  >
-                    {p && (
-                      <Photo
-                        product={p}
-                        width={i === 0 ? 800 : 500}
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                        sizes={
-                          i === 0
-                            ? "(min-width:1024px) 50vw, 42vw"
-                            : "(min-width:1024px) 25vw, 42vw"
-                        }
-                      />
-                    )}
-                    <span className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
-                    <span className="absolute inset-x-0 bottom-0 p-4 text-white lg:p-6">
-                      <span
-                        className={cn(
-                          "block font-display font-extrabold",
-                          i === 0 ? "text-lg lg:text-3xl" : "text-lg",
-                        )}
-                      >
-                        {r.label}
+                  <Tilt max={7} className="h-full" innerClassName="h-full">
+                    <Link
+                      to="/collectie/$slug"
+                      params={{ slug: r.slug }}
+                      className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-secondary shadow-soft transition duration-300 hover:shadow-lift lg:aspect-auto lg:h-full"
+                    >
+                      {p && (
+                        <Photo
+                          product={p}
+                          width={i === 0 ? 800 : 500}
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                          sizes={
+                            i === 0
+                              ? "(min-width:1024px) 50vw, 42vw"
+                              : "(min-width:1024px) 25vw, 42vw"
+                          }
+                        />
+                      )}
+                      <span className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
+                      <span className="absolute inset-x-0 bottom-0 p-4 text-white lg:p-6">
+                        <span
+                          className={cn(
+                            "block font-display font-extrabold",
+                            i === 0 ? "text-lg lg:text-3xl" : "text-lg",
+                          )}
+                        >
+                          {r.label}
+                        </span>
+                        <span className="text-xs text-white/80">{countIn(r.slug)} producten</span>
                       </span>
-                      <span className="text-xs text-white/80">{countIn(r.slug)} producten</span>
-                    </span>
-                  </Link>
+                    </Link>
+                  </Tilt>
                 </Reveal>
               );
             })}
@@ -433,34 +406,57 @@ function Index() {
       </section>
 
       {/* Waarom bij ons kopen */}
-      <section className="bg-white py-20 md:py-24" aria-labelledby="waarom-h">
-        <div className="mx-auto max-w-7xl px-4 lg:px-6">
-          <h2
-            id="waarom-h"
-            className="max-w-2xl text-balance font-display text-3xl tracking-tight md:text-5xl"
-          >
-            Waarom bij GoedkopeSchoenen kopen?
-          </h2>
-          <p className="mt-3 max-w-xl text-muted-foreground">
-            Sinds {SITE.founded} een vertrouwd adres uit Elst: betaalbaar, snel en met een mens aan
-            de andere kant.
-          </p>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="relative bg-white py-20 md:py-28" aria-labelledby="waarom-h">
+        <div className="mx-auto grid max-w-7xl gap-14 px-4 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-20 lg:px-6">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <h2
+              id="waarom-h"
+              className="text-balance font-display text-3xl tracking-tight md:text-4xl"
+            >
+              Waarom bij GoedkopeSchoenen kopen?
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Sinds {SITE.founded} een vertrouwd adres uit Elst: betaalbaar, snel en met een mens
+              aan de andere kant.
+            </p>
+            <dl className="mt-10 grid grid-cols-3 gap-4">
+              {[
+                { n: PRODUCTS.length, l: "producten" },
+                { n: countIn("sale"), l: "in de sale" },
+                { n: SUBS.length, l: "categorieën" },
+              ].map((x) => (
+                <Reveal key={x.l} className="rounded-2xl bg-cream p-4 text-center shadow-soft">
+                  <dd className="font-display text-3xl font-extrabold text-primary">
+                    <CountUp to={x.n} />
+                  </dd>
+                  <dt className="mt-1 text-xs text-muted-foreground">{x.l}</dt>
+                </Reveal>
+              ))}
+            </dl>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
             {WHY.map((w, i) => (
               <Reveal
                 key={w.title}
                 index={i}
-                className="rounded-2xl border border-border bg-background p-7 shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-lift"
+                className="group relative overflow-hidden rounded-3xl border border-border bg-background p-7 shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-lift"
               >
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-primary">
-                  <w.icon className="h-6 w-6" />
-                </span>
-                <h3 className="mt-5 font-display text-xl">{w.title}</h3>
-                <p className="mt-2 text-muted-foreground">{w.text}</p>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-primary/10 blur-2xl transition duration-500 group-hover:bg-primary/20"
+                />
+                <Floaty factor={i % 2 ? 0.05 : -0.05} delay={i * 0.4} className="relative w-fit">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cta text-white shadow-lift">
+                    <w.icon className="h-7 w-7" />
+                  </span>
+                </Floaty>
+                <h3 className="relative mt-5 font-display text-xl">{w.title}</h3>
+                <p className="relative mt-2 text-muted-foreground">{w.text}</p>
               </Reveal>
             ))}
           </div>
         </div>
+        <Deco3D className="absolute -bottom-20 right-10 z-10" />
       </section>
 
       {/* Social proof */}

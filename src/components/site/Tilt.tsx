@@ -6,11 +6,13 @@ export function Tilt({
   children,
   max = 26,
   className,
+  innerClassName,
   style,
 }: {
   children: ReactNode;
   max?: number;
   className?: string;
+  innerClassName?: string;
   style?: CSSProperties;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -48,7 +50,10 @@ export function Tilt({
     >
       <div
         ref={ref}
-        className="transition-[transform,box-shadow] duration-200 ease-out will-change-transform [transform-style:preserve-3d]"
+        className={cn(
+          "transition-[transform,box-shadow] duration-200 ease-out will-change-transform [transform-style:preserve-3d]",
+          innerClassName,
+        )}
       >
         {children}
       </div>

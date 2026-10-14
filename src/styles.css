@@ -282,3 +282,32 @@
     animation: none;
   }
 }
+
+/* Decoratieve beweging: zweven en draaien (uit bij prefers-reduced-motion) */
+@keyframes floatY {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes spin3d {
+  to {
+    transform: rotateY(360deg);
+  }
+}
+.float-y {
+  animation: floatY 6s ease-in-out infinite;
+}
+.spin-3d {
+  animation: spin3d 16s linear infinite;
+  transform: rotateX(-8deg) rotateY(25deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-y,
+  .spin-3d {
+    animation: none;
+  }
+}
