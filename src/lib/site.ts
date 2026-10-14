@@ -12,6 +12,9 @@ export const SITE = {
   founded: 2012,
   // Controleer deze cijfers bij livegang (uit eerdere analyse van de live site).
   kiyoh: { score: 9.3, count: 6531, url: "" },
+  // Openingstijden van de klantenservice, bijv. [{ days: "Ma–vr", time: "9:00–17:00" }, { days: "Za", time: "Gesloten" }].
+  // Leeg = niet tonen (de tijden zijn nergens vastgelegd, dus niet verzinnen).
+  hours: [] as { days: string; time: string }[],
   freeShippingFrom: 65,
   shippingCost: 5.99,
   // Vul de echte profiel-URL's in; alleen ingevulde netwerken worden getoond.

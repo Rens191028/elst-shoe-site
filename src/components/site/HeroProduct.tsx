@@ -37,6 +37,9 @@ export function HeroProduct({ product }: { product: Product }) {
         const sway = reduce ? 0 : Math.sin(t / 1900) * 15 * s.weight;
         const bob = reduce ? 0 : Math.cos(t / 2300) * 2.5 * s.weight;
         const scroll = reduce ? 0 : (Math.min(window.scrollY, 700) / 700) * 16;
+        // Parallax: de foto beweegt langzamer dan de tekst (die scrolt gewoon mee)
+        if (!reduce && el)
+          el.style.transform = `translate3d(0, ${Math.min(window.scrollY, 800) * 0.12}px, 0)`;
         const ry = s.dx + sway + scroll;
         const rx = s.dy + bob;
         if (card.current) card.current.style.transform = `rotateY(${ry}deg) rotateX(${rx}deg)`;
@@ -116,7 +119,9 @@ export function HeroProduct({ product }: { product: Product }) {
         </Link>
         <div className="pointer-events-none absolute -left-4 bottom-8 hidden rounded-2xl bg-white px-4 py-3 shadow-lift [transform:translateZ(60px)] sm:block">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-soft">Nu</p>
-          <p className="font-display text-xl font-extrabold text-primary-text">{money(product.p)}</p>
+          <p className="font-display text-xl font-extrabold text-primary-text">
+            {money(product.p)}
+          </p>
           {product.w && <p className="text-xs text-soft line-through">{money(product.w)}</p>}
         </div>
         <div className="pointer-events-none absolute -right-3 top-8 hidden items-center gap-2 rounded-2xl bg-ink px-4 py-3 text-white shadow-lift [transform:translateZ(80px)] sm:flex">

@@ -4,6 +4,9 @@ import { Heart, ImageOff, Plus, Check, Star } from "lucide-react";
 import { discountPct, img, isNew, money, type Product } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
+import { useAuth } from "@/lib/auth";
+import { flyToCart } from "@/lib/fly";
+import { MagneticButton } from "@/components/site/motion-extras";
 import { lowStock, lowStockLabel } from "@/lib/stock";
 import { CompareButton } from "@/components/site/shopper-ui";
 import { SITE } from "@/lib/site";
@@ -67,7 +70,7 @@ export function Price({ product, size = "md" }: { product: Product; size?: "md" 
       <span
         className={cn(
           "font-bold",
-          product.w ? "text-primary-text" : "text-ink",
+          product.w ? "price-flash text-primary-text" : "text-ink",
           size === "lg" ? "text-2xl" : "text-[0.95rem]",
         )}
       >
@@ -108,11 +111,19 @@ export function Badges({ product }: { product: Product }) {
 
 export function WishButton({ handle, className }: { handle: string; className?: string }) {
   const { has, toggle } = useFavorites();
+  const { user } = useAuth();
+  const [pulse, setPulse] = useState(false);
   const on = has(handle);
   return (
     <button
       type="button"
-      onClick={() => void toggle(handle)}
+      onClick={() => {
+        if (user && !on) {
+          setPulse(true);
+          setTimeout(() => setPulse(false), 520);
+        }
+        void toggle(handle);
+      }}
       aria-pressed={on}
       aria-label={on ? "Verwijder van favorieten" : "Bewaar als favoriet"}
       className={cn(
@@ -120,7 +131,13 @@ export function WishButton({ handle, className }: { handle: string; className?: 
         className,
       )}
     >
-      <Heart className={cn("h-[18px] w-[18px]", on && "fill-primary text-primary")} />
+      <Heart
+        className={cn(
+          "h-[18px] w-[18px] transition-[fill,color] duration-300",
+          on && "fill-primary text-primary",
+          pulse && "heart-pop",
+        )}
+      />
     </button>
   );
 }
@@ -131,6 +148,7 @@ export function CardBuyActions({ product }: { product: Product }) {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"buy" | "add" | null>(null);
   const [added, setAdded] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
   if (!product.s) return null;
 
   const run = (kind: "buy" | "add", size: string) => {
@@ -143,6 +161,8 @@ export function CardBuyActions({ product }: { product: Product }) {
       return;
     }
     add(product.h, size);
+    // de foto van het product vliegt naar het winkelwagen-icoon
+    flyToCart(root.current?.closest("article")?.querySelector("img") ?? root.current, product);
     setAdded(true);
     setTimeout(() => setAdded(false), 1400);
   };
@@ -150,7 +170,12 @@ export function CardBuyActions({ product }: { product: Product }) {
 
   if (mode)
     return (
-      <div className="mt-2 rounded-2xl bg-secondary p-2.5" role="group" aria-label="Kies je maat">
+      <div
+        ref={root}
+        className="mt-2 rounded-2xl bg-secondary p-2.5"
+        role="group"
+        aria-label="Kies je maat"
+      >
         <div className="mb-1.5 flex items-center justify-between">
           <p className="text-xs font-semibold">Kies je maat</p>
           <button
@@ -177,22 +202,22 @@ export function CardBuyActions({ product }: { product: Product }) {
     );
 
   return (
-    <div className="mt-2 grid gap-1.5">
-      <button
+    <div ref={root} className="mt-2 grid gap-1.5">
+      <MagneticButton
         type="button"
         onClick={() => choose("buy")}
         className="h-9 rounded-full bg-cta px-3 text-xs font-semibold text-white transition active:scale-[0.98]"
       >
         Bestel nu
-      </button>
-      <button
+      </MagneticButton>
+      <MagneticButton
         type="button"
         onClick={() => choose("add")}
         className="flex h-9 items-center justify-center gap-1.5 rounded-full border border-ink px-3 text-xs font-semibold text-ink transition hover:bg-ink hover:text-white active:scale-[0.98]"
       >
         {added ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
         {added ? "Toegevoegd" : "Toevoegen aan winkelwagen"}
-      </button>
+      </MagneticButton>
     </div>
   );
 }
@@ -217,7 +242,18 @@ export function ProductCard({
           "relative aspect-[4/5] overflow-hidden rounded-2xl bg-secondary shadow-soft transition duration-300 group-hover:-translate-y-1 group-hover:shadow-lift",
           list && "w-32 shrink-0 sm:w-44",
         )}
+        onPointerMove={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          e.currentTarget.style.setProperty("--cx", `${e.clientX - r.left}px`);
+          e.currentTarget.style.setProperty("--cy", `${e.clientY - r.top}px`);
+        }}
       >
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-[var(--cx,50%)] top-[var(--cy,50%)] z-10 ml-3 mt-3 rounded-full bg-ink px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-soft transition-opacity duration-200 group-hover:opacity-100 [@media(hover:none)]:hidden"
+        >
+          Bekijk
+        </span>
         <Link
           to="/products/$handle"
           params={{ handle: product.h }}

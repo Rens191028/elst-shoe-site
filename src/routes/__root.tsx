@@ -17,6 +17,7 @@ import { AuthProvider } from "@/lib/auth";
 import { FavoritesProvider } from "@/lib/favorites";
 import { ShopperProvider } from "@/lib/shopper";
 import { CompareTray } from "@/components/site/shopper-ui";
+import { RippleInit, ScrollProgress } from "@/components/site/motion-extras";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/cart";
@@ -167,6 +168,8 @@ function RootComponent() {
               >
                 Meteen naar de content
               </a>
+              <ScrollProgress />
+              <RippleInit />
               <Header />
               <main id="main">
                 {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
