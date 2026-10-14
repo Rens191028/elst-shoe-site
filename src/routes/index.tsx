@@ -21,9 +21,11 @@ import {
   type Product,
 } from "@/lib/catalog";
 import { REVIEWS, SITE, UGC } from "@/lib/site";
+import { BUNDLES } from "@/lib/bundles";
 import { CountUp, Reveal } from "@/components/site/motion";
 import { Tilt } from "@/components/site/Tilt";
 import { RecentlyViewed } from "@/components/site/shopper-ui";
+import { StarsFill } from "@/components/site/reviews";
 import { HeroProduct } from "@/components/site/HeroProduct";
 import { Deco3D, Floaty } from "@/components/site/decor";
 import { KiyohBadge, Photo, ProductCard } from "@/components/site/product";
@@ -357,6 +359,27 @@ function Index() {
             </div>
           </div>
 
+          <Reveal className="mt-6 flex flex-col items-start justify-between gap-4 rounded-2xl border border-primary/30 bg-white p-5 shadow-soft sm:flex-row sm:items-center">
+            <div className="flex items-center gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-cta text-white">
+                <Tag className="h-6 w-6" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="font-display text-lg font-bold">Bundeldeal: {BUNDLES[0]!.title}</p>
+                <p className="text-sm text-muted-foreground">
+                  Geldt voor schoenen buiten de sale. De korting zie je direct in je winkelwagen.
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/collectie/$slug"
+              params={{ slug: "schoenen" }}
+              className="shrink-0 rounded-full border border-ink px-6 py-3 text-sm font-semibold text-ink transition hover:bg-ink hover:text-white"
+            >
+              Shop schoenen
+            </Link>
+          </Reveal>
+
           <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4">
             {sale.map((p, i) => (
               <Reveal key={p.h} index={i}>
@@ -501,11 +524,9 @@ function Index() {
                     <Reveal
                       key={r.name}
                       index={i}
-                      className="w-[82%] shrink-0 rounded-2xl border border-border bg-white shadow-soft p-6 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary/50 md:w-auto"
+                      className="w-[82%] shrink-0 rounded-2xl border border-border bg-white shadow-soft p-6 transition duration-300 hover:-translate-y-1 hover:border-primary/50 md:w-auto"
                     >
-                      <p className="text-primary-text" aria-label={`${r.stars} van 5 sterren`}>
-                        {"★".repeat(r.stars)}
-                      </p>
+                      <StarsFill value={r.stars} />
                       <p className="mt-3">“{r.text}”</p>
                       <p className="mt-4 text-sm font-semibold">{r.name}</p>
                     </Reveal>

@@ -17,18 +17,16 @@ export const Route = createFileRoute("/maatadvies")({
   component: SizeAdvice,
 });
 
-type Fit = "smal" | "normaal" | "breed";
+import { adviseSize, type Fit } from "@/lib/sizing";
+
+// Opnieuw geëxporteerd voor bestaande imports
+export { adviseSize };
+
 const FITS: { v: Fit; l: string; d: string }[] = [
   { v: "smal", l: "Smal", d: "Schoenen zitten vaak wat ruim" },
   { v: "normaal", l: "Normaal", d: "Standaard pasvorm is prima" },
   { v: "breed", l: "Breed", d: "Schoenen knellen soms" },
 ];
-
-// EU-maat ≈ (voetlengte + 1,5 cm ruimte) × 1,5; bij een brede voet een maat groter.
-export function adviseSize(lengthCm: number, fit: Fit) {
-  const base = Math.round((lengthCm + 1.5) * 1.5);
-  return base + (fit === "breed" ? 1 : 0);
-}
 
 function SizeAdvice() {
   const [step, setStep] = useState(1);

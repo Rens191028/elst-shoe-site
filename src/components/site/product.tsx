@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, ImageOff, Plus, Check, Star } from "lucide-react";
 import { discountPct, img, isNew, money, type Product } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
@@ -125,6 +125,78 @@ export function WishButton({ handle, className }: { handle: string; className?: 
   );
 }
 
+/** Primair "Bestel nu" (direct naar de checkout) en secundair "Toevoegen aan winkelwagen". */
+export function CardBuyActions({ product }: { product: Product }) {
+  const { add } = useCart();
+  const navigate = useNavigate();
+  const [mode, setMode] = useState<"buy" | "add" | null>(null);
+  const [added, setAdded] = useState(false);
+  if (!product.s) return null;
+
+  const run = (kind: "buy" | "add", size: string) => {
+    setMode(null);
+    if (kind === "buy") {
+      void navigate({
+        to: "/afrekenen",
+        search: { direct: product.h, ...(size ? { maat: size } : {}) },
+      });
+      return;
+    }
+    add(product.h, size);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1400);
+  };
+  const choose = (kind: "buy" | "add") => (product.m.length ? setMode(kind) : run(kind, ""));
+
+  if (mode)
+    return (
+      <div className="mt-2 rounded-2xl bg-secondary p-2.5" role="group" aria-label="Kies je maat">
+        <div className="mb-1.5 flex items-center justify-between">
+          <p className="text-xs font-semibold">Kies je maat</p>
+          <button
+            type="button"
+            onClick={() => setMode(null)}
+            className="text-xs text-muted-foreground underline underline-offset-2 hover:text-ink"
+          >
+            Annuleer
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {product.m.map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => run(mode, m)}
+              className="h-8 min-w-8 rounded-md border border-border bg-white px-1.5 text-xs font-semibold transition hover:border-ink hover:bg-ink hover:text-white"
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="mt-2 grid gap-1.5">
+      <button
+        type="button"
+        onClick={() => choose("buy")}
+        className="h-9 rounded-full bg-cta px-3 text-xs font-semibold text-white transition active:scale-[0.98]"
+      >
+        Bestel nu
+      </button>
+      <button
+        type="button"
+        onClick={() => choose("add")}
+        className="flex h-9 items-center justify-center gap-1.5 rounded-full border border-ink px-3 text-xs font-semibold text-ink transition hover:bg-ink hover:text-white active:scale-[0.98]"
+      >
+        {added ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+        {added ? "Toegevoegd" : "Toevoegen aan winkelwagen"}
+      </button>
+    </div>
+  );
+}
+
 export function ProductCard({
   product,
   index = 0,
@@ -136,17 +208,7 @@ export function ProductCard({
   eager?: boolean;
   view?: "grid" | "list";
 }) {
-  const { add } = useCart();
   const list = view === "list";
-  const [picking, setPicking] = useState(false);
-  const [added, setAdded] = useState(false);
-
-  const quickAdd = (size: string) => {
-    add(product.h, size);
-    setPicking(false);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1400);
-  };
 
   return (
     <article className={cn("group relative", list && "flex gap-4 sm:gap-6")} data-index={index}>
@@ -175,43 +237,6 @@ export function ProductCard({
           <Badges product={product} />
         </div>
         <WishButton handle={product.h} className="absolute right-2.5 top-2.5" />
-
-        {product.s && (
-          <div className="absolute inset-x-2 bottom-2">
-            {picking ? (
-              <div
-                className="rounded-lg bg-white/95 p-2 shadow-md backdrop-blur"
-                role="group"
-                aria-label="Kies je maat"
-              >
-                <p className="mb-1.5 text-[11px] font-semibold text-muted-foreground">
-                  Kies je maat
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {product.m.map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      onClick={() => quickAdd(m)}
-                      className="h-8 min-w-8 rounded-md border border-border bg-white px-1.5 text-xs font-semibold transition hover:border-ink hover:bg-ink hover:text-white"
-                    >
-                      {m}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => (product.m.length ? setPicking(true) : quickAdd(""))}
-                className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-white/95 py-2 text-xs font-semibold text-ink opacity-100 shadow-sm backdrop-blur transition hover:bg-ink hover:text-white md:translate-y-2 md:opacity-0 md:group-focus-within:translate-y-0 md:group-focus-within:opacity-100 md:group-hover:translate-y-0 md:group-hover:opacity-100"
-              >
-                {added ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-                {added ? "Toegevoegd" : "Snel toevoegen"}
-              </button>
-            )}
-          </div>
-        )}
       </div>
       <div className={cn("space-y-1 px-0.5", list ? "flex-1 pt-2" : "mt-3")}>
         <h3
@@ -230,6 +255,7 @@ export function ProductCard({
             {lowStockLabel(lowStock(product)!)}
           </p>
         )}
+        <CardBuyActions product={product} />
         <CompareButton handle={product.h} className="pt-1" />
         {list && (
           <p className="pt-1 text-sm text-muted-foreground">

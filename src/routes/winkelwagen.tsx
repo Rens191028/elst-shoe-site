@@ -3,7 +3,7 @@ import { ShoppingBag } from "lucide-react";
 import { crossSell, money } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
-import { CartLineRow, CrossSell, ShippingBar } from "@/components/site/cart";
+import { CartLineRow, CrossSell, PriceRows, ShippingBar } from "@/components/site/cart";
 
 export const Route = createFileRoute("/winkelwagen")({
   head: () => ({
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/winkelwagen")({
 });
 
 function CartPage() {
-  const { lines, subtotal, shipping, total } = useCart();
+  const { lines, net, subtotal, discount, bundle, bundleHint, shipping, total } = useCart();
   const suggestions = crossSell(
     lines.map((l) => l.h),
     3,
@@ -40,7 +40,7 @@ function CartPage() {
           <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_380px]">
             <div>
               <ShippingBar
-                subtotal={subtotal}
+                subtotal={net}
                 className="rounded-2xl border border-border bg-white shadow-soft p-4"
               />
               <ul className="mt-2">
@@ -54,20 +54,10 @@ function CartPage() {
             </div>
             <aside className="h-fit space-y-4 rounded-2xl border border-border bg-white shadow-soft p-6 lg:sticky lg:top-24">
               <h2 className="font-display text-xl font-bold">Overzicht</h2>
-              <dl className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Subtotaal</dt>
-                  <dd>{money(subtotal)}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Verzending</dt>
-                  <dd>{shipping === 0 ? "Gratis" : money(shipping)}</dd>
-                </div>
-                <div className="flex justify-between border-t border-border pt-3 text-lg font-bold">
-                  <dt>Totaal</dt>
-                  <dd>{money(total)}</dd>
-                </div>
-              </dl>
+              <PriceRows
+                big
+                price={{ subtotal, discount, bundle, hint: bundleHint, shipping, total }}
+              />
               <p className="text-xs text-muted-foreground">Incl. btw.</p>
               <Link
                 to="/afrekenen"

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AfrekenenRouteImport } from './routes/afrekenen'
 import { Route as BedanktRouteImport } from './routes/bedankt'
+import { Route as CadeaubonRouteImport } from './routes/cadeaubon'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FavorietenRouteImport } from './routes/favorieten'
@@ -50,6 +51,11 @@ const AfrekenenRoute = AfrekenenRouteImport.update({
 const BedanktRoute = BedanktRouteImport.update({
   id: '/bedankt',
   path: '/bedankt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadeaubonRoute = CadeaubonRouteImport.update({
+  id: '/cadeaubon',
+  path: '/cadeaubon',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRouteWithChildren
   '/afrekenen': typeof AfrekenenRoute
   '/bedankt': typeof BedanktRoute
+  '/cadeaubon': typeof CadeaubonRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/favorieten': typeof FavorietenRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/afrekenen': typeof AfrekenenRoute
   '/bedankt': typeof BedanktRoute
+  '/cadeaubon': typeof CadeaubonRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/favorieten': typeof FavorietenRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRouteWithChildren
   '/afrekenen': typeof AfrekenenRoute
   '/bedankt': typeof BedanktRoute
+  '/cadeaubon': typeof CadeaubonRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/favorieten': typeof FavorietenRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/afrekenen'
     | '/bedankt'
+    | '/cadeaubon'
     | '/contact'
     | '/faq'
     | '/favorieten'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/'
     | '/afrekenen'
     | '/bedankt'
+    | '/cadeaubon'
     | '/contact'
     | '/faq'
     | '/favorieten'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/afrekenen'
     | '/bedankt'
+    | '/cadeaubon'
     | '/contact'
     | '/faq'
     | '/favorieten'
@@ -294,6 +306,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRouteWithChildren
   AfrekenenRoute: typeof AfrekenenRoute
   BedanktRoute: typeof BedanktRoute
+  CadeaubonRoute: typeof CadeaubonRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   FavorietenRoute: typeof FavorietenRoute
@@ -339,6 +352,13 @@ declare module '@tanstack/react-router' {
       path: '/bedankt'
       fullPath: '/bedankt'
       preLoaderRoute: typeof BedanktRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadeaubon': {
+      id: '/cadeaubon'
+      path: '/cadeaubon'
+      fullPath: '/cadeaubon'
+      preLoaderRoute: typeof CadeaubonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -490,6 +510,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRouteWithChildren,
   AfrekenenRoute: AfrekenenRoute,
   BedanktRoute: BedanktRoute,
+  CadeaubonRoute: CadeaubonRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   FavorietenRoute: FavorietenRoute,

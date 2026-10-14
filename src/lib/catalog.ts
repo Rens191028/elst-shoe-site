@@ -1,5 +1,6 @@
 import raw from "@/data/products.json";
 import { SITE } from "@/lib/site";
+import { parseVoucherHandle, voucherProduct } from "@/lib/voucher";
 
 export type Product = {
   h: string; // handle
@@ -15,7 +16,7 @@ export type Product = {
   a: string; // toegevoegd op (YYYY-MM-DD)
 };
 
-export type GroupSlug = "schoenen" | "tassen" | "accessoires";
+export type GroupSlug = "schoenen" | "tassen" | "accessoires" | "cadeaubon";
 export type CategorySlug =
   | "laarzen"
   | "sneakers"
@@ -25,11 +26,23 @@ export type CategorySlug =
   | "schoudertasjes"
   | "grote-tassen"
   | "portemonnees"
-  | "sieraden";
+  | "sieraden"
+  | "cadeaubon";
 
 export const PRODUCTS = raw as Product[];
 const BY_HANDLE = new Map(PRODUCTS.map((p) => [p.h, p]));
-export const getProduct = (handle: string) => BY_HANDLE.get(handle);
+export function getProduct(handle: string): Product | undefined {
+  const found = BY_HANDLE.get(handle);
+  if (found) return found;
+  const amount = parseVoucherHandle(handle);
+  return amount !== null ? voucherProduct(amount) : undefined;
+}
+
+/** Tekst bij een winkelwagenregel: maat, of bij een cadeaubon voor wie hij is. */
+export function variantLabel(p: Product, variant: string): string {
+  if (p.g === "cadeaubon") return variant;
+  return variant ? `Maat ${variant}` : "Eén maat";
+}
 
 export type Collection = {
   slug: string;
