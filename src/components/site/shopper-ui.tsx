@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Scale, X } from "lucide-react";
+import { ChevronDown, Scale, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getCollection, getProduct, related, type Product } from "@/lib/catalog";
 import { useFavorites } from "@/lib/favorites";
@@ -34,53 +34,84 @@ export function CompareButton({ handle, className }: { handle: string; className
   );
 }
 
-/** Zwevende balk met de gekozen producten; verschijnt zodra er minstens één is gekozen. */
+/** Vaste, uitklapbare balk onderaan; "Vergelijk nu" werkt zodra er minstens twee producten zijn gekozen. */
 export function CompareTray() {
   const { compare, toggleCompare, clearCompare } = useShopper();
+  const [collapsed, setCollapsed] = useState(false);
   const items = compare.map(getProduct).filter((p): p is Product => !!p);
   if (items.length === 0) return null;
+  const ready = items.length >= 2;
   return (
     <div
       role="region"
       aria-label="Vergelijken"
-      className="fixed bottom-4 left-4 right-24 z-30 flex max-w-md items-center gap-3 rounded-2xl border border-border bg-white p-3 shadow-lift sm:right-auto"
+      className="fixed bottom-4 left-4 right-24 z-30 max-w-md rounded-2xl border border-border bg-white p-3 shadow-lift sm:right-auto"
     >
-      <ul className="flex gap-2">
-        {items.map((p) => (
-          <li key={p.h} className="group relative">
-            <span className="block h-12 w-10 overflow-hidden rounded-lg bg-secondary">
-              <Photo product={p} width={120} className="h-full w-full object-cover" sizes="40px" />
-            </span>
-            <button
-              type="button"
-              onClick={() => toggleCompare(p.h)}
-              aria-label={`Verwijder ${p.t} uit vergelijking`}
-              className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-white"
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold">
+          Vergelijken ({items.length}/{MAX_COMPARE})
+        </p>
+        <button
+          type="button"
+          aria-expanded={!collapsed}
+          onClick={() => setCollapsed((c) => !c)}
+          aria-label={collapsed ? "Vergelijkbalk uitklappen" : "Vergelijkbalk inklappen"}
+          className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-ink"
+        >
+          <ChevronDown
+            className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")}
+            aria-hidden="true"
+          />
+        </button>
+      </div>
+      {!collapsed && (
+        <div className="mt-2 flex items-center gap-3">
+          <ul className="flex gap-2">
+            {items.map((p) => (
+              <li key={p.h} className="group relative">
+                <span className="block h-12 w-10 overflow-hidden rounded-lg bg-secondary">
+                  <Photo
+                    product={p}
+                    width={120}
+                    className="h-full w-full object-cover"
+                    sizes="40px"
+                  />
+                </span>
+                <button
+                  type="button"
+                  onClick={() => toggleCompare(p.h)}
+                  aria-label={`Verwijder ${p.t} uit vergelijking`}
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-white"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </li>
+            ))}
+          </ul>
+          {ready ? (
+            <Link
+              to="/vergelijken"
+              className="ml-auto whitespace-nowrap rounded-full bg-cta px-4 py-2 text-sm font-semibold text-white"
             >
-              <X className="h-3 w-3" />
-            </button>
-          </li>
-        ))}
-      </ul>
-      <Link
-        to="/vergelijken"
-        className="ml-auto whitespace-nowrap rounded-full bg-cta px-4 py-2 text-sm font-semibold text-white"
-      >
-        Vergelijk ({items.length})
-      </Link>
-      <button
-        type="button"
-        onClick={clearCompare}
-        aria-label="Vergelijking leegmaken"
-        className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-ink"
-      >
-        <X className="h-4 w-4" />
-      </button>
+              Vergelijk nu
+            </Link>
+          ) : (
+            <p className="ml-auto text-xs text-muted-foreground">Kies er nog 1 om te vergelijken</p>
+          )}
+          <button
+            type="button"
+            onClick={clearCompare}
+            aria-label="Vergelijking leegmaken"
+            className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-ink"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-/** "Eerder bekeken": toont alleen producten die deze bezoeker echt bekeken heeft. */
 export function RecentlyViewed({ exclude, className }: { exclude?: string; className?: string }) {
   const { recent } = useShopper();
   const items = recent

@@ -1,6 +1,23 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { LayoutGrid, List, SlidersHorizontal, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  ArrowUp,
+  Briefcase,
+  Footprints,
+  Gem,
+  Home,
+  LayoutGrid,
+  List,
+  Mountain,
+  Shapes,
+  ShoppingBag,
+  SlidersHorizontal,
+  Wallet,
+  X,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { collapseVariants } from "@/lib/variants";
 import {
   Sheet,
   SheetContent,
@@ -128,6 +145,53 @@ export const Route = createFileRoute("/collectie/$slug")({
 
 const PAGE = 24;
 
+/** Zachte accentkleur per hoofdcategorie (donker genoeg voor witte tekst); sale/nieuw houden de huisstijl. */
+const THEME: Record<string, { color: string; tint: string; Icon: LucideIcon }> = {
+  schoenen: { color: "#7a5238", tint: "#f3ebe3", Icon: Footprints },
+  tassen: { color: "#b8603c", tint: "#f8e9df", Icon: ShoppingBag },
+  accessoires: { color: "#8a6d1f", tint: "#f5eedb", Icon: Gem },
+};
+const SUB_ICON: Record<string, LucideIcon> = {
+  laarzen: Footprints,
+  sneakers: Zap,
+  "boots-festival": Mountain,
+  pantoffels: Home,
+  "overig-schoenen": Shapes,
+  schoudertasjes: ShoppingBag,
+  "grote-tassen": Briefcase,
+  portemonnees: Wallet,
+  sieraden: Gem,
+};
+const catBtn = "border-[var(--cat,var(--ink))] bg-[var(--cat,var(--ink))] text-white";
+
+function BackToTop() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const on = () => setShow(window.scrollY > 900);
+    on();
+    window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
+  if (!show) return null;
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        window.scrollTo({
+          top: 0,
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "auto"
+            : "smooth",
+        })
+      }
+      aria-label="Terug naar boven"
+      className="fixed bottom-24 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white text-ink shadow-lift transition hover:-translate-y-0.5 sm:bottom-24"
+    >
+      <ArrowUp className="h-5 w-5" aria-hidden="true" />
+    </button>
+  );
+}
+
 function CollectionPage() {
   const { slug } = Route.useParams();
   const search = Route.useSearch();
@@ -141,7 +205,12 @@ function CollectionPage() {
   const fac = useMemo(() => facets(base), [base]);
   const isSale = slug === "sale";
   const sort: Sort = search.sort ?? (isSale ? "korting" : "nieuw");
-  const list = useMemo(() => applyFilters(base, { ...search, sort }), [base, search, sort]);
+  const filtered = useMemo(() => applyFilters(base, { ...search, sort }), [base, search, sort]);
+  // Eén kaart per model met kleurstipjes; filter je op kleur, dan zie je juist die varianten
+  const list = useMemo(
+    () => (search.kleur?.length ? filtered : collapseVariants(filtered)),
+    [filtered, search.kleur],
+  );
 
   const set = (patch: Partial<Search>) => {
     setShown(PAGE);
@@ -159,29 +228,46 @@ function CollectionPage() {
     (search.sale ? 1 : 0);
   const group = collection.group ? COLLECTIONS.find((c) => c.slug === collection.group) : undefined;
 
+  const theme = THEME[collection.group ?? collection.slug];
   const crumbs = [
     ...(collection.cat && group ? [{ label: group.title, slug: group.slug }] : []),
     { label: collection.title },
   ];
 
   return (
-    <div className={isSale ? "sale-theme" : undefined}>
+    <div
+      className={isSale ? "sale-theme" : undefined}
+      style={
+        theme
+          ? ({ "--cat": theme.color, "--cat-tint": theme.tint } as React.CSSProperties)
+          : undefined
+      }
+    >
       <Breadcrumbs items={crumbs} />
       {isSale && <SaleHero count={base.length} />}
       <section className="mx-auto max-w-7xl px-4 pb-6 pt-4 lg:px-6">
         <div
           className={cn(
-            "flex flex-col justify-between gap-4 md:flex-row md:items-end",
+            "relative flex flex-col justify-between gap-4 overflow-hidden md:flex-row md:items-end",
             isSale && "hidden",
+            theme && "rounded-3xl bg-[var(--cat-tint)] px-6 py-8 md:px-10 md:py-12",
           )}
         >
-          <div>
+          {theme && (
+            <theme.Icon
+              aria-hidden="true"
+              strokeWidth={0.6}
+              className="pointer-events-none absolute -right-6 -top-6 h-64 w-64 text-[var(--cat)] opacity-[0.12] md:h-80 md:w-80"
+            />
+          )}
+          <div className="relative">
             <h1 className="font-display text-4xl font-extrabold tracking-tight md:text-5xl">
               {collection.title}
             </h1>
-            <p className="mt-2 max-w-xl text-muted-foreground">{collection.blurb}</p>
+            {theme && <span className="mt-3 block h-1.5 w-16 rounded-full bg-[var(--cat)]" />}
+            <p className="mt-3 max-w-xl text-muted-foreground">{collection.blurb}</p>
           </div>
-          <KiyohBadge />
+          <KiyohBadge className="relative" />
         </div>
         {(subs.length > 0 || siblings.length > 0) && (
           <div className="mt-6 flex flex-wrap gap-2" aria-label="Subcategorieën">
@@ -209,9 +295,14 @@ function CollectionPage() {
                   params={{ slug: s.slug }}
                   className={cn(
                     "rounded-full border px-4 py-2 text-sm font-medium transition hover:border-ink",
-                    s.slug === slug ? "border-ink bg-ink text-white" : "border-border bg-white",
+                    "inline-flex items-center gap-1.5",
+                    s.slug === slug ? catBtn : "border-border bg-white",
                   )}
                 >
+                  {(() => {
+                    const I = SUB_ICON[s.slug] ?? theme?.Icon;
+                    return I ? <I className="h-4 w-4" aria-hidden="true" /> : null;
+                  })()}
                   {s.title} <span className="opacity-60">{s.n}</span>
                 </Link>
               ))}
@@ -226,7 +317,7 @@ function CollectionPage() {
               <button
                 type="button"
                 onClick={() => setPanel(true)}
-                className="flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold transition hover:border-ink"
+                className="flex items-center gap-2 rounded-full border border-[var(--cat,var(--border))]/50 bg-white px-4 py-2 text-sm font-semibold transition hover:border-[var(--cat,var(--ink))]"
               >
                 <SlidersHorizontal className="h-4 w-4" />
                 Filters
@@ -411,9 +502,7 @@ function CollectionPage() {
                         }
                         className={cn(
                           "rounded-full border px-3 py-1.5 text-sm transition",
-                          on
-                            ? "border-ink bg-ink text-white"
-                            : "border-border bg-white hover:border-ink",
+                          on ? catBtn : "border-border bg-white hover:border-ink",
                         )}
                       >
                         {c.name} <span className="opacity-60">{c.n}</span>
@@ -435,9 +524,7 @@ function CollectionPage() {
                       onClick={() => set({ maat: search.maat === s.name ? undefined : s.name })}
                       className={cn(
                         "h-10 min-w-10 rounded-lg border px-2 text-sm font-medium transition",
-                        search.maat === s.name
-                          ? "border-ink bg-ink text-white"
-                          : "border-border bg-white hover:border-ink",
+                        search.maat === s.name ? catBtn : "border-border bg-white hover:border-ink",
                       )}
                     >
                       {s.name}
@@ -458,6 +545,7 @@ function CollectionPage() {
           </div>
         </SheetContent>
       </Sheet>
+      <BackToTop />
     </div>
   );
 }

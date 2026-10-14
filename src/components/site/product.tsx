@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, ImageOff, Plus, Check, Star } from "lucide-react";
+import { colorVariants, colorHex } from "@/lib/variants";
 import { discountPct, img, isNew, money, type Product } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
@@ -9,6 +10,7 @@ import { flyToCart } from "@/lib/fly";
 import { MagneticButton } from "@/components/site/motion-extras";
 import { lowStock, lowStockLabel } from "@/lib/stock";
 import { CompareButton } from "@/components/site/shopper-ui";
+import { QuickView } from "@/components/site/QuickView";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/site/motion";
@@ -316,6 +318,7 @@ export function ProductCard({
           <Badges product={product} sale={!!sale} />
         </div>
         <WishButton handle={product.h} className="absolute right-2.5 top-2.5" />
+        <QuickView product={product} />
       </div>
       <div className={cn("space-y-1 px-0.5", list ? "flex-1 pt-2" : "mt-3")}>
         <h3
@@ -339,6 +342,7 @@ export function ProductCard({
             {lowStockLabel(lowStock(product)!)}
           </p>
         )}
+        <ColorDots product={product} />
         <CardBuyActions product={product} />
         <CompareButton handle={product.h} className="pt-1" />
         {list && (
@@ -354,6 +358,35 @@ export function ProductCard({
         )}
       </div>
     </article>
+  );
+}
+
+/** Kleurstipjes van de andere varianten van dit model; elk stipje linkt naar die variant. */
+export function ColorDots({ product }: { product: Product }) {
+  const variants = colorVariants(product);
+  if (variants.length < 2) return null;
+  return (
+    <ul className="flex flex-wrap items-center gap-1.5 pt-0.5" aria-label="Beschikbare kleuren">
+      {variants.map((v) => {
+        const name = v.k[0]!;
+        const current = v.h === product.h;
+        return (
+          <li key={v.h}>
+            <Link
+              to="/products/$handle"
+              params={{ handle: v.h }}
+              aria-label={`${name}${current ? " (deze)" : ""}`}
+              title={name}
+              className={cn(
+                "block h-5 w-5 rounded-full border border-black/20 transition hover:scale-125",
+                current && "ring-2 ring-ink ring-offset-1 ring-offset-background",
+              )}
+              style={{ background: colorHex(name) }}
+            />
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

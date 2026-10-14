@@ -23,6 +23,9 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - Kennisbank: artikelen in `src/data/articles.ts`, routes `/kennisbank` en `/kennisbank/$slug` (Article JSON-LD); `build-sitemap.mjs` leest de slugs.
 - Productpagina mobiel: vaste "Bestel nu"-balk zodra de gewone knoppen uit beeld zijn. Homepage: "Omdat je … bekeek" (`PersonalPicks`) uit lokaal bekeken/favorieten.
 - Exit-intent (`ExitIntent`): alleen desktop met hover, 1× per week, niet in checkout/account, zelfde WELKOM10-aanbod als de footer.
+- FAQ: inhoud in `src/data/faq.ts` (alleen vaststaande feiten; twijfelgevallen verwijzen naar contact). Homepage-sectie `FaqSection` (vervangt "Eerder bekeken" op de homepage; die blijft op de productpagina) en volledige pagina `/faq` (categorieën, FAQPage JSON-LD), met het decoratieve `ShoeBox3D` dat meereageert op open/dicht.
+- Categoriepagina's: per hoofdcategorie een zachte accentkleur (`THEME` in `collectie.$slug.tsx`, via `--cat`), banner met lijnicoon, icoon per subcategorie, "Terug naar boven", quick view (`QuickView`), en één kaart per model met kleurstipjes (`src/lib/variants.ts`; bij een kleurfilter zie je de losse varianten). Vergelijkbalk (`CompareTray`) is inklapbaar; "Vergelijk nu" vanaf 2 producten.
+- Afrekenen: de melding "je winkelwagen blijft ongewijzigd" verschijnt alleen als er daadwerkelijk andere items in de wagen zitten.
 - Bedrijfsgegevens en winkelregels: `src/lib/site.ts`.
 
 ## Huisstijl
@@ -45,6 +48,9 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - Levertijdbelofte overal gelijk: op werkdagen voor 15:00 besteld, dezelfde dag verzonden.
 
 ## Open punten
+
+- Categoriebanners zijn gradient + lijnicoon: een echte sfeerfoto per categorie vraagt eigen beeldmateriaal.
+- FAQ-antwoord over ruilen verwijst naar contact: laat de winkelier de ruilregels bevestigen.
 
 - Sale-einddatum: vul `SITE.saleEndsAt` (ISO) voor een echte countdown; leeg = geen countdown.
 - Cadeaubon: code-uitgifte, e-mailbezorging en inwisselen bij het afrekenen vragen een backend; nu toont de bon in de demo geen code.

@@ -597,3 +597,68 @@ a.bg-cta:hover {
     transform: scaleX(1);
   }
 }
+
+/* FAQ: accordeon die vloeiend open- en dichtklapt, en een draaiende 3D-doos */
+.faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease;
+}
+.faq-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.faq-panel > div {
+  overflow: hidden;
+}
+.faq-chevron {
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-open="true"] > .faq-chevron,
+.faq-chevron[data-open="true"] {
+  transform: rotate(180deg);
+}
+@keyframes boxSpin {
+  to {
+    transform: rotateY(360deg);
+  }
+}
+@keyframes boxBounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    transform: translateY(-14px) scale(1.05);
+  }
+  65% {
+    transform: translateY(2px) scale(0.99);
+  }
+}
+.box-spin {
+  animation: boxSpin 26s linear infinite;
+  transform-style: preserve-3d;
+}
+.box-bounce {
+  animation: boxBounce 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.box-lid {
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-panel,
+  .faq-chevron,
+  .box-lid {
+    transition: none;
+  }
+  .box-spin {
+    animation: none;
+    transform: rotateY(-30deg);
+  }
+  .box-bounce {
+    animation: none;
+  }
+}
