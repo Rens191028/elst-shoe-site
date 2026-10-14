@@ -353,3 +353,165 @@
     transition: none;
   }
 }
+
+/* Zoekveld klapt vanaf het icoon (rechts) uit */
+@keyframes searchIn {
+  from {
+    clip-path: inset(0 0 0 85%);
+    opacity: 0.4;
+  }
+  to {
+    clip-path: inset(0);
+    opacity: 1;
+  }
+}
+.search-in {
+  animation: searchIn 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .search-in {
+    animation: none;
+  }
+}
+
+/* ---------- Motion-taal (zie docs/visuele-stijl-animaties-header-task.md) ---------- */
+
+/* Hartje: zachte pop bij opslaan */
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.4);
+  }
+  65% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.heart-pop {
+  animation: heartPop 480ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Sale-prijs: kort aandachtseffect bij laden */
+@keyframes priceFlash {
+  0% {
+    background-color: transparent;
+  }
+  30% {
+    background-color: color-mix(in srgb, var(--primary) 18%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+.price-flash {
+  display: inline-block;
+  border-radius: 8px;
+  animation: priceFlash 1.5s ease-out 500ms 1 both;
+}
+
+/* Hero-prijs: schaal-in */
+@keyframes priceIntro {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.price-intro {
+  display: inline-block;
+  transform-origin: left bottom;
+  animation: priceIntro 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 550ms both;
+}
+
+/* Ripple vanaf het klikpunt */
+.ripple-host {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.32);
+  transform: scale(0);
+  animation: rippleOut 600ms ease-out forwards;
+}
+@keyframes rippleOut {
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Magnetische knoppen */
+.magnetic {
+  transition: transform 160ms ease-out;
+}
+
+/* Hover-gloed in de accentkleur op primaire knoppen */
+button.bg-cta:hover,
+a.bg-cta:hover {
+  box-shadow: 0 12px 28px -10px color-mix(in srgb, var(--primary) 65%, transparent);
+}
+
+/* Paginawissel: zachte cross-fade (View Transitions); de header blijft staan */
+.site-header {
+  view-transition-name: site-header;
+}
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: 160ms ease-out both vtOut;
+  }
+  ::view-transition-new(root) {
+    animation: 260ms ease-out both vtIn;
+  }
+}
+@keyframes vtOut {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vtIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Vinkje dat zichzelf tekent */
+@keyframes checkDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.check-draw path {
+  stroke-dasharray: 26;
+  stroke-dashoffset: 26;
+  animation: checkDraw 450ms ease-out 150ms forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .heart-pop,
+  .price-flash,
+  .price-intro,
+  .check-draw path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .ripple {
+    animation: none;
+    display: none;
+  }
+  .magnetic {
+    transition: none;
+  }
+}

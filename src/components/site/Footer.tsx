@@ -46,8 +46,8 @@ function Newsletter() {
               className="anim-fade-up rounded-2xl border border-border bg-card p-5 shadow-sm"
             >
               <p className="flex items-center gap-2 font-semibold">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                  <Check className="h-4 w-4" />
+                <span className="check-draw flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Check className="h-4 w-4" aria-hidden="true" />
                 </span>
                 Bedankt voor je inschrijving!
               </p>
@@ -212,6 +212,21 @@ export function Footer() {
               Contact
             </Link>
           </li>
+          {SITE.hours.length > 0 && (
+            <li className="pt-3">
+              <p className="mb-1.5 text-xs font-bold uppercase tracking-widest text-ink">
+                Openingstijden
+              </p>
+              <dl className="space-y-0.5 text-sm text-muted-foreground">
+                {SITE.hours.map((h) => (
+                  <div key={h.days} className="flex justify-between gap-4">
+                    <dt>{h.days}</dt>
+                    <dd className="text-ink">{h.time}</dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          )}
         </Column>
 
         <Column title="Over ons">

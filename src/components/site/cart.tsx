@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { crossSell, money, variantLabel, type Product } from "@/lib/catalog";
 import { useCart, type DetailedLine } from "@/lib/cart";
+import { flyToCart } from "@/lib/fly";
 import { SITE } from "@/lib/site";
 import { Photo, Price } from "@/components/site/product";
 import { cn } from "@/lib/utils";
@@ -241,7 +242,13 @@ export function CrossSell({
               <button
                 type="button"
                 disabled={needsSize && !size}
-                onClick={() => add(p.h, size)}
+                onClick={(e) => {
+                  add(p.h, size);
+                  flyToCart(
+                    e.currentTarget.closest("li")?.querySelector("img") ?? e.currentTarget,
+                    p,
+                  );
+                }}
                 className="rounded-full border border-ink px-3 py-1.5 text-xs font-semibold transition hover:bg-ink hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-ink"
               >
                 Toevoegen

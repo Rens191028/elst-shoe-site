@@ -172,7 +172,7 @@ function Index() {
               className="anim-fade-up mt-6 text-balance font-display text-[2.6rem] font-extrabold leading-[1.02] tracking-tight text-ink sm:text-6xl lg:text-7xl"
               style={{ "--i": 1 } as React.CSSProperties}
             >
-              Mooie schoenen vanaf <span className="text-primary-text">€8,99</span>
+              Mooie schoenen vanaf <span className="price-intro text-primary-text">€8,99</span>
             </h1>
             <p
               className="anim-fade-up mx-auto mt-5 max-w-lg text-lg text-muted-foreground lg:mx-0"

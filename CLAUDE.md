@@ -7,7 +7,7 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - TanStack Start (React 19, file-routes in `src/routes`), Tailwind v4, shadcn/ui, Lovable-gekoppeld (geen git-history herschrijven).
 - **Geen Shopify**: geen koppeling, geen vermelding in code/copy. (Alleen de bestaande productfoto-URL's in de catalogus staan nog op het oude CDN; zie "Open punten".)
 - Catalogus: `src/data/products.json`, gegenereerd uit de xlsx met `python3 -I scripts/build-catalog.py <xlsx>` (normaliseert kleuren, categorieën en van-prijzen). Niet met de hand bewerken.
-- Winkelwagen: `src/lib/cart.tsx` (localStorage). Toevoegen opent de lade niet: de header-winkelwagen toont een permanente balk met aantal en totaal zolang er items zijn (en "popt" bij toevoegen via `addTick`); alleen een lege wagen toont het kale icoon. Bedragen komen uit `priceLines` (`src/lib/bundles.ts`).
+- Winkelwagen: `src/lib/cart.tsx` (localStorage). Toevoegen opent de lade niet: de header-winkelwagen toont een permanente balk met aantal en totaal zolang er items zijn (rustig: witte balk met dunne rand; "popt" en een mini-foto vliegt ernaartoe bij toevoegen via `addTick`/`flyToCart`); alleen een lege wagen toont het kale icoon. Bedragen komen uit `priceLines` (`src/lib/bundles.ts`).
 - Bundelkorting: regels in `BUNDLES` (`src/lib/bundles.ts`); nu 10% bij 2 paar schoenen buiten de sale. De voorwaarden zijn een voorstel: laat de winkelier bevestigen.
 - "Bestel nu" (kaart en productpagina) gaat naar `/afrekenen?direct=<handle>&maat=<maat>` en laat de winkelwagen ongemoeid.
 - Cadeaubon: virtueel product `cadeaubon-<bedrag>` (`src/lib/voucher.ts`, niet in de catalogus); de "maat" is voor wie de bon is. Pagina `/cadeaubon`. Levering per e-mail vraagt nog een backend.
@@ -23,6 +23,8 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 
 - Tokens in `src/styles.css`: achtergrond `#FAFAF8`, tekst `#141413`, accent terracotta `#B5582E` (hover `#99471F`). Accent spaarzaam: CTA's, sale-badges, highlights.
 - Archivo (koppen/logo, 800, iets verbreed via `font-stretch: 112%`) + Inter (body, 400). Logo "Tempo": drie gekantelde staafjes + wordmark (`components/site/Logo.tsx`, `public/favicon.svg`).
+- Motion-taal: hartje-pop, ripple op primaire knoppen (`RippleInit`), magnetische kaartknoppen (`MagneticButton`), "Bekijk"-cursorlabel op productfoto's, scrollvoortgangsbalk, hero-parallax, sale-prijs-flash, View Transitions voor paginawissels (`defaultViewTransition`). Alles uit bij `prefers-reduced-motion`.
+- Zoeken is een icoon dat inline uitklapt (`InlineSearch`); het mega-menu heeft één categorielijst + één knop en één focus (nieuw in …).
 - Animaties 200–400ms, rustig, respecteer `prefers-reduced-motion`. Geen autoplay-carrousels, nep-urgentie (countdowns zonder echte einddatum) of pop-ups. 3D-tilt/pseudo-3D alleen op hero, categorietegels (licht) en productpagina; het zwevende merkicoon (`Deco3D`) is puur decoratief.
 
 ## Regels
@@ -48,6 +50,7 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - Mega-menu toont "Nieuw in …" i.p.v. "Populair in …" (geen verkoopdata).
 - Niet gebouwd uit het conversie-document, bewust: "X mensen bekeken dit"/"laatst besteld" (geen echte activiteitsdata; verzonnen cijfers zijn misleidend), track & trace (orders hebben geen vervoerder-/trackingvelden), verlaten-winkelwagen-mail en refer-a-friend (vragen een e-mailbackend), dark mode (nice to have).
 - "Retour aanvragen" in het account opent een voorgevuld e-mailtje (geen retourportaal).
+- Openingstijden: `SITE.hours` (site.ts) is leeg; de tijden zijn nergens vastgelegd. Vul in, dan verschijnen ze in de footer en op /contact.
 - Mobiel: onder 640px verbergt het logo zijn woordnaam zodra er items in de wagen zitten (ruimte voor de balk); op 320px breed loopt de header nog ~25px over.
 - Social-URL's invullen in `SITE.social`; ManyChat-widget nog niet geplaatst.
 - Productfoto's staan nog op het oude CDN: verhuizen naar eigen opslag; achtergrondverwerking pas na testbatch.

@@ -9,6 +9,7 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
+    defaultViewTransition: true, // zachte cross-fade tussen pagina's
     defaultPreloadStaleTime: 0,
   });
 

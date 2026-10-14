@@ -23,6 +23,7 @@ import { BUNDLES } from "@/lib/bundles";
 import { SizeChartButton } from "@/components/site/SizeChart";
 import { ProductReviews } from "@/components/site/reviews";
 import { useShopper } from "@/lib/shopper";
+import { flyToCart } from "@/lib/fly";
 import { CompareButton, RecentlyViewed } from "@/components/site/shopper-ui";
 import { LOW_STOCK, sizeStock } from "@/lib/stock";
 import { SITE } from "@/lib/site";
@@ -159,9 +160,10 @@ function ProductPage() {
     }
     return true;
   };
-  const addToCart = () => {
+  const addToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!ready()) return;
     add(p.h, size);
+    flyToCart(document.querySelector("[data-product-photo]") ?? e.currentTarget, p);
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);
   };
@@ -202,7 +204,10 @@ function ProductPage() {
       <article className="mx-auto grid max-w-7xl gap-10 px-4 py-8 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:px-6">
         <div className="relative lg:col-start-1 lg:row-start-1">
           <Tilt max={9}>
-            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-secondary">
+            <div
+              data-product-photo
+              className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-secondary"
+            >
               <Photo
                 product={p}
                 width={1000}
