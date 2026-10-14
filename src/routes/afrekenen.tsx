@@ -105,7 +105,7 @@ function Checkout() {
       />
       <section className="mx-auto max-w-7xl px-4 pb-8 pt-4 lg:px-6">
         <h1 className="font-display text-4xl font-extrabold tracking-tight">Afrekenen</h1>
-        {isDirect && (
+        {isDirect && cart.lines.length > 0 && (
           <p className="mt-3 rounded-2xl bg-secondary px-4 py-3 text-sm">
             Je bestelt alleen <strong>{lines[0]!.product.t}</strong>. Je winkelwagen blijft
             ongewijzigd.{" "}
