@@ -30,7 +30,7 @@ type Ctx = {
 };
 
 // Stabiel over hot-reloads heen: anders verwijzen al geladen componenten naar een oude context.
-const g = globalThis as unknown as { __gsCartCtx?: React.Context<Ctx | null> };
+const g = globalThis as unknown as { __gsCartCtx?: ReactContext<Ctx | null> };
 const CartContext = (g.__gsCartCtx ??= createContext<Ctx | null>(null));
 const CART_KEY = "gs-cart-v1";
 
