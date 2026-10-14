@@ -54,7 +54,7 @@ export function ExitIntent() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md rounded-3xl p-8">
+      <DialogContent className="glass max-w-md rounded-3xl p-8">
         <p className="text-xs font-bold uppercase tracking-widest text-primary-text">
           Voor je weggaat
         </p>

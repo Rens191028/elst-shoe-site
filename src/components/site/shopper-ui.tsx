@@ -45,7 +45,7 @@ export function CompareTray() {
     <div
       role="region"
       aria-label="Vergelijken"
-      className="fixed bottom-4 left-4 right-24 z-30 max-w-md rounded-2xl border border-border bg-white p-3 shadow-lift sm:right-auto"
+      className="fixed bottom-4 left-4 right-24 z-30 max-w-md glass rounded-2xl border border-border p-3 shadow-lift sm:right-auto"
     >
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold">

@@ -309,7 +309,7 @@ function CartButton() {
         className={cn(
           "relative flex h-9 items-center rounded-full transition-[background-color,color,box-shadow,padding] duration-300 sm:h-10",
           filled
-            ? "border border-ink/15 bg-white pl-3.5 text-ink shadow-soft hover:border-ink"
+            ? "glass border border-ink/15 pl-3.5 text-ink shadow-soft hover:border-ink"
             : "text-ink hover:bg-secondary active:scale-90",
           pop && "cart-pop",
         )}

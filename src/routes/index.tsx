@@ -1,22 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  Clock,
-  CreditCard,
-  MessageCircle,
-  RotateCcw,
-  Ruler,
-  ShieldCheck,
-  Star,
-  Tag,
-  Truck,
-} from "lucide-react";
+import { ArrowRight, Ruler, ShieldCheck, Star, Tag } from "lucide-react";
 import {
   countIn,
   getCollection,
   inCollection,
   money,
   PRODUCTS,
+  discountPct,
   SUBS,
   type Product,
 } from "@/lib/catalog";
@@ -28,7 +18,9 @@ import { CountUp, Reveal } from "@/components/site/motion";
 import { Tilt } from "@/components/site/Tilt";
 import { PersonalPicks } from "@/components/site/shopper-ui";
 import { StarsFill } from "@/components/site/reviews";
-import { HeroProduct } from "@/components/site/HeroProduct";
+import { Wave } from "@/components/site/brand";
+import { HeroCarousel } from "@/components/site/HeroCarousel";
+import { IconChat, IconClock, IconPay, IconReturn, IconTruck } from "@/components/site/icons";
 import { Deco3D, Floaty } from "@/components/site/decor";
 import { KiyohBadge, Photo, ProductCard } from "@/components/site/product";
 import { cn } from "@/lib/utils";
@@ -79,10 +71,14 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-const HERO_PRODUCT =
-  PRODUCTS.find((p) => p.c === "laarzen" && p.s && p.w && p.p >= 39) ??
-  PRODUCTS.find((p) => p.s) ??
-  PRODUCTS[0]!;
+/** 3-5 echte sale-producten voor de hero: hoogste korting, uit verschillende categorieën, op voorraad. */
+const HERO_PRODUCTS = (() => {
+  const seen = new Set<string>();
+  return PRODUCTS.filter((p) => p.s && p.w && p.p >= 19)
+    .sort((a, b) => discountPct(b) - discountPct(a))
+    .filter((p) => (seen.has(p.c) ? false : (seen.add(p.c), true)))
+    .slice(0, 4);
+})();
 
 const RAIL = [
   { slug: "laarzen", label: "Laarzen" },
@@ -100,37 +96,37 @@ function tileImage(slug: string): Product | undefined {
 
 const USPS = [
   {
-    icon: Truck,
+    icon: IconTruck,
     title: `Gratis verzending vanaf ${money(SITE.freeShippingFrom)}`,
     text: "Daaronder slechts " + money(SITE.shippingCost) + ".",
   },
   {
-    icon: CreditCard,
+    icon: IconPay,
     title: "Achteraf betalen met Klarna",
     text: "Ook iDEAL, creditcard en Bancontact.",
   },
-  { icon: RotateCcw, title: "30 dagen retour", text: "Past het niet? Stuur het simpel terug." },
-  { icon: Clock, title: "Dezelfde dag verzonden", text: "Op werkdagen voor 15:00 besteld." },
+  { icon: IconReturn, title: "30 dagen retour", text: "Past het niet? Stuur het simpel terug." },
+  { icon: IconClock, title: "Dezelfde dag verzonden", text: "Op werkdagen voor 15:00 besteld." },
 ];
 
 const WHY = [
   {
-    icon: Truck,
+    icon: IconTruck,
     title: "Snel in huis",
     text: "Op werkdagen voor 15:00 besteld verzenden we dezelfde dag met PostNL.",
   },
   {
-    icon: CreditCard,
+    icon: IconPay,
     title: "Betaal zoals jij wilt",
     text: "iDEAL, Klarna (achteraf betalen), creditcard of Bancontact.",
   },
   {
-    icon: RotateCcw,
+    icon: IconReturn,
     title: "30 dagen retour",
     text: "Niet tevreden? Meld je retour en we regelen het zonder gedoe.",
   },
   {
-    icon: MessageCircle,
+    icon: IconChat,
     title: "Echte klantenservice",
     text: `Bel of app ons op ${SITE.phone}, of mail naar ${SITE.email}.`,
   },
@@ -140,7 +136,7 @@ const WHY = [
     text: "Eerlijke prijzen, zonder verrassingen aan de kassa.",
   },
   {
-    icon: Clock,
+    icon: IconClock,
     title: `Sinds ${SITE.founded} uit Elst`,
     text:
       "Begonnen op beurzen, nu een webshop met Kiyoh-score " +
@@ -164,8 +160,14 @@ function Index() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-14 pt-8 md:pt-12 lg:grid-cols-[1.05fr_1fr] lg:px-6 lg:pb-20">
+      <section className="relative isolate overflow-hidden">
+        <div className="mesh" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
+        <Wave fill="var(--background)" className="absolute inset-x-0 bottom-0 -z-[1]" />
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-20 pt-8 md:pt-12 lg:grid-cols-[1.05fr_1fr] lg:px-6 lg:pb-20">
           <div className="text-center lg:text-left">
             <div className="anim-fade-up" style={{ "--i": 0 } as React.CSSProperties}>
               <KiyohBadge className="rounded-full border border-border bg-white px-4 py-2 shadow-sm" />
@@ -208,16 +210,16 @@ function Index() {
               style={{ "--i": 4 } as React.CSSProperties}
             >
               <li className="flex items-center gap-2">
-                <Truck className="h-4 w-4 text-primary" /> Gratis verzending vanaf €65
+                <IconTruck className="h-4 w-4 text-primary" /> Gratis verzending vanaf €65
               </li>
               <li className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4 text-primary" /> Achteraf betalen met Klarna
+                <IconPay className="h-4 w-4 text-primary" /> Achteraf betalen met Klarna
               </li>
             </ul>
           </div>
 
           <div className="anim-fade-up" style={{ "--i": 2 } as React.CSSProperties}>
-            <HeroProduct product={HERO_PRODUCT} />
+            <HeroCarousel products={HERO_PRODUCTS} />
           </div>
         </div>
       </section>

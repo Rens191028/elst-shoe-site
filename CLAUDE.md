@@ -26,6 +26,8 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - FAQ: inhoud in `src/data/faq.ts` (alleen vaststaande feiten; twijfelgevallen verwijzen naar contact). Homepage-sectie `FaqSection` (vervangt "Eerder bekeken" op de homepage; die blijft op de productpagina) en volledige pagina `/faq` (categorieën, FAQPage JSON-LD), met het decoratieve `ShoeBox3D` dat meereageert op open/dicht.
 - Categoriepagina's: per hoofdcategorie een zachte accentkleur (`THEME` in `collectie.$slug.tsx`, via `--cat`), banner met lijnicoon, icoon per subcategorie, "Terug naar boven", quick view (`QuickView`), en één kaart per model met kleurstipjes (`src/lib/variants.ts`; bij een kleurfilter zie je de losse varianten). Vergelijkbalk (`CompareTray`) is inklapbaar; "Vergelijk nu" vanaf 2 producten.
 - Afrekenen: de melding "je winkelwagen blijft ongewijzigd" verschijnt alleen als er daadwerkelijk andere items in de wagen zitten.
+- Hero (`HeroCarousel` + `HeroProduct`): 4 echte sale-producten (hoogste korting, andere categorie), klikbaar naar de productpagina, wisselen met pijltjes/stipjes/toetsenbord (bewust geen autoplay: projectregel). De draai is pseudo-3D uit één foto (de data heeft geen meerdere hoeken) met momentum na loslaten en dubbelklik-zoom; de andere producten worden voorgeladen. Pointer-capture pas bij echt slepen, anders komt een klik niet bij de link.
+- Visuele details: gradient-mesh achter de hero (`.mesh`), golfovergangen (`Wave` in `brand.tsx`), glas (`.glass`) op winkelwagenbalk, vergelijkbalk, chat en exit-popup, eigen lijnicoonset (`icons.tsx`) voor USP's en categorieën, één badge-ontwerp (`Badge`), merk-laadanimatie (`BrandLoader` als `defaultPendingComponent`, pas na 400ms), confetti op `/bedankt`, dunne scrollbar, 404 op merk.
 - Bedrijfsgegevens en winkelregels: `src/lib/site.ts`.
 
 ## Huisstijl
@@ -48,6 +50,8 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - Levertijdbelofte overal gelijk: op werkdagen voor 15:00 besteld, dezelfde dag verzonden.
 
 ## Open punten
+
+- Hero-draaien met meerdere hoeken per product vraagt extra foto's; nu één foto per product (pseudo-3D).
 
 - Categoriebanners zijn gradient + lijnicoon: een echte sfeerfoto per categorie vraagt eigen beeldmateriaal.
 - FAQ-antwoord over ruilen verwijst naar contact: laat de winkelier de ruilregels bevestigen.
