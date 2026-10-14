@@ -10,13 +10,19 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - Winkelwagen: `src/lib/cart.tsx` (localStorage). Toevoegen opent de lade niet: de header-winkelwagen toont een permanente balk met aantal en totaal zolang er items zijn (rustig: witte balk met dunne rand; "popt" en een mini-foto vliegt ernaartoe bij toevoegen via `addTick`/`flyToCart`); alleen een lege wagen toont het kale icoon. Bedragen komen uit `priceLines` (`src/lib/bundles.ts`).
 - Bundelkorting: regels in `BUNDLES` (`src/lib/bundles.ts`); nu 10% bij 2 paar schoenen buiten de sale. De voorwaarden zijn een voorstel: laat de winkelier bevestigen.
 - "Bestel nu" (kaart en productpagina) gaat naar `/afrekenen?direct=<handle>&maat=<maat>` en laat de winkelwagen ongemoeid.
-- Cadeaubon: virtueel product `cadeaubon-<bedrag>` (`src/lib/voucher.ts`, niet in de catalogus); de "maat" is voor wie de bon is. Pagina `/cadeaubon`. Levering per e-mail vraagt nog een backend.
+- Cadeaubon: virtueel product `cadeaubon-<bedrag>` (`src/lib/voucher.ts`, niet in de catalogus); de "maat" is `Voor <naam> — “boodschap”` (geen e-mail ontvanger: de bon gaat naar de koper). Pagina `/cadeaubon` met live voorbeeldkaart; `VoucherCard`/`voucherSvg` is de ene bron voor weergave, PNG-download en print. Op `/bedankt` krijgt de koper de bon; de unieke code (`generateVoucherCode`) wordt alleen getoond als `SITE.checkoutLive`, en moet dan ook in een backend worden vastgelegd en bij het afrekenen gevalideerd.
 - Reviews per product: `src/data/reviews.json` (`{handle: [{name, stars, text, date?, photo?}]}`), nu leeg; nooit verzinnen. Foto-upload door klanten vraagt een database + opslag + moderatie.
 - Orderbevestigingsmail: `src/lib/emails/orderConfirmation.ts` (huisstijl-HTML + tekst), nog niet gekoppeld aan een mailservice.
 - Vergelijken (max 3) en "eerder bekeken": `src/lib/shopper.tsx` (localStorage, geen account nodig); UI in `components/site/shopper-ui.tsx`, pagina `/vergelijken`.
 - SEO: `public/sitemap.xml` genereren met `node scripts/build-sitemap.mjs` na elke catalogus-update (`src/test/seo.test.ts` bewaakt de dekking). Titels/descriptions via `seoTitle`/`seoDescription`; OG-afbeelding `public/og-image.png`.
 - Voorraad: `src/lib/stock.ts` leest `src/data/stock.json` (`{handle: {maat: aantal}}`). De catalogus heeft alleen ja/nee; zonder aangeleverde aantallen wordt nooit een aantal getoond.
 - Accounts: Supabase Auth (e-mail + wachtwoord) via `src/lib/auth.tsx`; favorieten alleen met account (`src/lib/favorites.tsx`, geen gast-wishlist). Tabellen `profiles`, `favorites`, `orders` met RLS: zie `supabase/migrations/`. `src/integrations/supabase/*` is auto-gegenereerd, niet met de hand bewerken (behalve het bijwerken van `types.ts` na een migratie).
+- Checkout (`/afrekenen`): stappen Gegevens → Verzending → Betalen (cadeaubon: Gegevens → Betalen), live verzendbelofte via `src/lib/cutoff.ts` + `CutoffNotice` (15:00 Amsterdam, feestdagen niet meegenomen), "Veilig betalen"-blok bij de betaalknop.
+- Sale (`/collectie/sale`): donker thema via `.sale-theme` (tokens overschreven), `SaleHero` ("Tot -X%" uit de catalogus), standaard sortering op korting. Countdown alleen als `SITE.saleEndsAt` gevuld is.
+- Voorraadmelding (`StockAlert`): bij uitverkocht een "laat me weten"-knop; zonder backend een voorgevulde e-mail (mailto).
+- Kennisbank: artikelen in `src/data/articles.ts`, routes `/kennisbank` en `/kennisbank/$slug` (Article JSON-LD); `build-sitemap.mjs` leest de slugs.
+- Productpagina mobiel: vaste "Bestel nu"-balk zodra de gewone knoppen uit beeld zijn. Homepage: "Omdat je … bekeek" (`PersonalPicks`) uit lokaal bekeken/favorieten.
+- Exit-intent (`ExitIntent`): alleen desktop met hover, 1× per week, niet in checkout/account, zelfde WELKOM10-aanbod als de footer.
 - Bedrijfsgegevens en winkelregels: `src/lib/site.ts`.
 
 ## Huisstijl
@@ -25,7 +31,7 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - Archivo (koppen/logo, 800, iets verbreed via `font-stretch: 112%`) + Inter (body, 400). Logo "Tempo": drie gekantelde staafjes + wordmark (`components/site/Logo.tsx`, `public/favicon.svg`).
 - Motion-taal: hartje-pop, ripple op primaire knoppen (`RippleInit`), magnetische kaartknoppen (`MagneticButton`), "Bekijk"-cursorlabel op productfoto's, scrollvoortgangsbalk, hero-parallax, sale-prijs-flash, View Transitions voor paginawissels (`defaultViewTransition`). Alles uit bij `prefers-reduced-motion`.
 - Zoeken is een icoon dat inline uitklapt (`InlineSearch`); het mega-menu heeft één categorielijst + één knop en één focus (nieuw in …).
-- Animaties 200–400ms, rustig, respecteer `prefers-reduced-motion`. Geen autoplay-carrousels, nep-urgentie (countdowns zonder echte einddatum) of pop-ups. 3D-tilt/pseudo-3D alleen op hero, categorietegels (licht) en productpagina; het zwevende merkicoon (`Deco3D`) is puur decoratief.
+- Animaties 200–400ms, rustig, respecteer `prefers-reduced-motion`. Geen autoplay-carrousels, nep-urgentie (countdowns zonder echte einddatum) of pop-ups; enige uitzondering is de rustige exit-intent op desktop (1× per week). 3D-tilt/pseudo-3D alleen op hero, categorietegels (licht) en productpagina; het zwevende merkicoon (`Deco3D`) is puur decoratief.
 
 ## Regels
 
@@ -39,6 +45,11 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - Levertijdbelofte overal gelijk: op werkdagen voor 15:00 besteld, dezelfde dag verzonden.
 
 ## Open punten
+
+- Sale-einddatum: vul `SITE.saleEndsAt` (ISO) voor een echte countdown; leeg = geen countdown.
+- Cadeaubon: code-uitgifte, e-mailbezorging en inwisselen bij het afrekenen vragen een backend; nu toont de bon in de demo geen code.
+- Voorraadmelding gaat via mailto; een echte melding bij herbevoorrading vraagt een tabel + mail (database-wijziging eerst bevestigen).
+- Duurzaamheid/herkomst per product niet gebouwd: er is geen data over herkomst; niets verzinnen. Het onderhoudsartikel noemt alleen langer dragen.
 
 - Checkout is een **demo** (`SITE.checkoutLive = false`): backend, betaalprovider (iDEAL/Klarna/creditcard/Bancontact) en orderverwerking ontbreken nog.
 - Zet in Supabase (Authentication) "Confirm email" uit en voeg `<site-url>/wachtwoord-resetten` toe aan de toegestane redirect-URL's.

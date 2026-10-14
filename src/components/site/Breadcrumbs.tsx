@@ -18,7 +18,11 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
         {items.map((c, i) => (
           <li key={c.label} className="flex items-center gap-1">
             <ChevronRight className="h-3.5 w-3.5" />
-            {c.slug ? (
+            {c.to ? (
+              <Link to={c.to} className="hover:text-ink">
+                {c.label}
+              </Link>
+            ) : c.slug ? (
               <Link to="/collectie/$slug" params={{ slug: c.slug }} className="hover:text-ink">
                 {c.label}
               </Link>

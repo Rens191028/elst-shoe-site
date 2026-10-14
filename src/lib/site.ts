@@ -25,6 +25,8 @@ export const SITE = {
   } as Record<"instagram" | "facebook" | "tiktok", string>,
   // Zolang er geen betaalprovider/backend is gekoppeld blijft de checkout een demo.
   checkoutLive: false,
+  /** Einddatum van de sale (ISO, bv. "2026-11-30T23:59:00+01:00"). Leeg = geen countdown tonen. */
+  saleEndsAt: "",
 } as const;
 
 // Echte klantcitaten hier invullen; de sectie op de homepage verschijnt zodra er items zijn.

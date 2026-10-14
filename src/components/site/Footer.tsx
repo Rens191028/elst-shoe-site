@@ -189,6 +189,11 @@ export function Footer() {
               Cadeaubon
             </Link>
           </li>
+          <li>
+            <Link to="/kennisbank" className={linkCls}>
+              Kennisbank
+            </Link>
+          </li>
         </Column>
 
         <Column title="Klantenservice">

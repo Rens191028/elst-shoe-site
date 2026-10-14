@@ -24,7 +24,7 @@ import { REVIEWS, SITE, UGC } from "@/lib/site";
 import { BUNDLES } from "@/lib/bundles";
 import { CountUp, Reveal } from "@/components/site/motion";
 import { Tilt } from "@/components/site/Tilt";
-import { RecentlyViewed } from "@/components/site/shopper-ui";
+import { PersonalPicks, RecentlyViewed } from "@/components/site/shopper-ui";
 import { StarsFill } from "@/components/site/reviews";
 import { HeroProduct } from "@/components/site/HeroProduct";
 import { Deco3D, Floaty } from "@/components/site/decor";
@@ -547,6 +547,7 @@ function Index() {
         </div>
       </section>
 
+      <PersonalPicks className="mx-auto max-w-7xl px-4 pt-20 lg:px-6" />
       <RecentlyViewed className="mx-auto max-w-7xl px-4 pt-20 lg:px-6" />
 
       {/* Maatadvies */}

@@ -31,6 +31,8 @@ import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as AccountFavorietenRouteImport } from './routes/account.favorieten'
 import { Route as AccountGegevensRouteImport } from './routes/account.gegevens'
 import { Route as CollectieSlugRouteImport } from './routes/collectie.$slug'
+import { Route as KennisbankIndexRouteImport } from './routes/kennisbank.index'
+import { Route as KennisbankSlugRouteImport } from './routes/kennisbank.$slug'
 import { Route as ProductsHandleRouteImport } from './routes/products.$handle'
 
 const IndexRoute = IndexRouteImport.update({
@@ -143,6 +145,16 @@ const CollectieSlugRoute = CollectieSlugRouteImport.update({
   path: '/collectie/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KennisbankIndexRoute = KennisbankIndexRouteImport.update({
+  id: '/kennisbank/',
+  path: '/kennisbank/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KennisbankSlugRoute = KennisbankSlugRouteImport.update({
+  id: '/kennisbank/$slug',
+  path: '/kennisbank/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsHandleRoute = ProductsHandleRouteImport.update({
   id: '/products/$handle',
   path: '/products/$handle',
@@ -171,8 +183,10 @@ export interface FileRoutesByFullPath {
   '/account/favorieten': typeof AccountFavorietenRoute
   '/account/gegevens': typeof AccountGegevensRoute
   '/collectie/$slug': typeof CollectieSlugRoute
+  '/kennisbank/$slug': typeof KennisbankSlugRoute
   '/products/$handle': typeof ProductsHandleRoute
   '/account/': typeof AccountIndexRoute
+  '/kennisbank/': typeof KennisbankIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -195,8 +209,10 @@ export interface FileRoutesByTo {
   '/account/favorieten': typeof AccountFavorietenRoute
   '/account/gegevens': typeof AccountGegevensRoute
   '/collectie/$slug': typeof CollectieSlugRoute
+  '/kennisbank/$slug': typeof KennisbankSlugRoute
   '/products/$handle': typeof ProductsHandleRoute
   '/account': typeof AccountIndexRoute
+  '/kennisbank': typeof KennisbankIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -221,8 +237,10 @@ export interface FileRoutesById {
   '/account/favorieten': typeof AccountFavorietenRoute
   '/account/gegevens': typeof AccountGegevensRoute
   '/collectie/$slug': typeof CollectieSlugRoute
+  '/kennisbank/$slug': typeof KennisbankSlugRoute
   '/products/$handle': typeof ProductsHandleRoute
   '/account/': typeof AccountIndexRoute
+  '/kennisbank/': typeof KennisbankIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -248,8 +266,10 @@ export interface FileRouteTypes {
     | '/account/favorieten'
     | '/account/gegevens'
     | '/collectie/$slug'
+    | '/kennisbank/$slug'
     | '/products/$handle'
     | '/account/'
+    | '/kennisbank/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -272,8 +292,10 @@ export interface FileRouteTypes {
     | '/account/favorieten'
     | '/account/gegevens'
     | '/collectie/$slug'
+    | '/kennisbank/$slug'
     | '/products/$handle'
     | '/account'
+    | '/kennisbank'
   id:
     | '__root__'
     | '/'
@@ -297,8 +319,10 @@ export interface FileRouteTypes {
     | '/account/favorieten'
     | '/account/gegevens'
     | '/collectie/$slug'
+    | '/kennisbank/$slug'
     | '/products/$handle'
     | '/account/'
+    | '/kennisbank/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -321,7 +345,9 @@ export interface RootRouteChildren {
   WinkelwagenRoute: typeof WinkelwagenRoute
   ZoekenRoute: typeof ZoekenRoute
   CollectieSlugRoute: typeof CollectieSlugRoute
+  KennisbankSlugRoute: typeof KennisbankSlugRoute
   ProductsHandleRoute: typeof ProductsHandleRoute
+  KennisbankIndexRoute: typeof KennisbankIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -480,6 +506,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectieSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kennisbank/': {
+      id: '/kennisbank/'
+      path: '/kennisbank'
+      fullPath: '/kennisbank/'
+      preLoaderRoute: typeof KennisbankIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kennisbank/$slug': {
+      id: '/kennisbank/$slug'
+      path: '/kennisbank/$slug'
+      fullPath: '/kennisbank/$slug'
+      preLoaderRoute: typeof KennisbankSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products/$handle': {
       id: '/products/$handle'
       path: '/products/$handle'
@@ -525,7 +565,9 @@ const rootRouteChildren: RootRouteChildren = {
   WinkelwagenRoute: WinkelwagenRoute,
   ZoekenRoute: ZoekenRoute,
   CollectieSlugRoute: CollectieSlugRoute,
+  KennisbankSlugRoute: KennisbankSlugRoute,
   ProductsHandleRoute: ProductsHandleRoute,
+  KennisbankIndexRoute: KennisbankIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

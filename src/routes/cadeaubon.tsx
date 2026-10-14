@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Check, Gift, Mail } from "lucide-react";
+import { Check, Download, Gift, Mail } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { Field, FormError, inputCls } from "@/components/site/auth-ui";
-import { LogoMark } from "@/components/site/Logo";
+import { VoucherCard } from "@/components/site/VoucherCard";
 import { money } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { SITE } from "@/lib/site";
@@ -35,7 +35,6 @@ export const Route = createFileRoute("/cadeaubon")({
 
 const schema = z.object({
   to: z.string().trim().min(1, "Vul in voor wie de cadeaubon is.").max(60),
-  email: z.string().trim().email("Vul een geldig e-mailadres in van de ontvanger."),
   message: z.string().trim().max(160, "Houd je boodschap onder de 160 tekens."),
 });
 
@@ -45,7 +44,6 @@ function Voucher() {
   const [preset, setPreset] = useState<number | "eigen">(25);
   const [custom, setCustom] = useState("");
   const [to, setTo] = useState("");
-  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [added, setAdded] = useState(false);
@@ -58,7 +56,7 @@ function Voucher() {
       setError(`Kies een bedrag tussen ${money(VOUCHER_MIN)} en ${money(VOUCHER_MAX)}.`);
       return null;
     }
-    const parsed = schema.safeParse({ to, email, message });
+    const parsed = schema.safeParse({ to, message });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Controleer je gegevens.");
       return null;
@@ -66,7 +64,7 @@ function Voucher() {
     setError("");
     return {
       h: voucherHandle(amount),
-      variant: voucherVariant(parsed.data.to, parsed.data.email, parsed.data.message),
+      variant: voucherVariant(parsed.data.to, parsed.data.message),
     };
   };
 
@@ -76,8 +74,8 @@ function Voucher() {
       <section className="mx-auto max-w-5xl px-4 pb-8 pt-4 lg:px-6">
         <h1 className="font-display text-4xl tracking-tight md:text-5xl">Cadeaubon</h1>
         <p className="mt-2 max-w-xl text-muted-foreground">
-          Het perfecte cadeau als je de maat of smaak niet kent. Kies een bedrag; de ontvanger kiest
-          zelf.
+          Het perfecte cadeau als je de maat of smaak niet kent. Kies een bedrag, vul de naam en een
+          persoonlijke boodschap in: jij ontvangt de bon en geeft hem zelf cadeau.
         </p>
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_380px]">
@@ -143,24 +141,15 @@ function Voucher() {
               )}
             </fieldset>
 
-            <Field label="Voor wie is de cadeaubon?" id="v-to">
+            <Field
+              label="Voor wie is de cadeaubon?"
+              id="v-to"
+              hint="De naam komt op de bon te staan."
+            >
               <input
                 id="v-to"
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
-                className={inputCls}
-              />
-            </Field>
-            <Field
-              label="E-mailadres van de ontvanger"
-              id="v-email"
-              hint="Hier sturen we de cadeaubon naartoe."
-            >
-              <input
-                id="v-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className={inputCls}
               />
             </Field>
@@ -202,8 +191,8 @@ function Voucher() {
             </div>
             {!SITE.checkoutLive && (
               <p role="note" className="text-xs text-muted-foreground">
-                De checkout is nog een demo: de cadeaubon wordt pas verstuurd zodra bestellen live
-                is.
+                De checkout is nog een demo: de cadeaubon (met code) wordt pas verstuurd zodra
+                bestellen live is.
               </p>
             )}
           </form>
@@ -212,30 +201,19 @@ function Voucher() {
             aria-label="Voorbeeld van de cadeaubon"
             className="lg:sticky lg:top-28 lg:self-start"
           >
-            <div className="relative aspect-[8/5] overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-primary-hover p-7 text-white shadow-lift">
-              <span className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10" />
-              <div className="relative flex h-full flex-col justify-between">
-                <div className="flex items-center gap-3">
-                  <LogoMark className="[&_span:nth-child(1)]:!bg-white [&_span:nth-child(n+2)]:!bg-ink" />
-                  <span className="font-display text-lg font-extrabold">GoedkopeSchoenen</span>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-white/80">
-                    Cadeaubon
-                  </p>
-                  <p className="font-display text-5xl font-extrabold">
-                    {amountOk ? money(amount) : "€ —"}
-                  </p>
-                </div>
-                <p className="line-clamp-2 text-sm text-white/90">
-                  {to ? `Voor ${to}` : "Voor jou"}
-                  {message && ` — “${message}”`}
-                </p>
-              </div>
-            </div>
+            <VoucherCard
+              amount={amountOk ? amount : null}
+              to={to.trim()}
+              message={message.trim()}
+            />
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" aria-hidden="true" /> Per e-mail bezorgd
+                <Mail className="h-4 w-4 text-primary" aria-hidden="true" /> Na betaling per e-mail
+                naar jou
+              </li>
+              <li className="flex items-center gap-2">
+                <Download className="h-4 w-4 text-primary" aria-hidden="true" /> Direct te
+                downloaden of printen, met unieke code
               </li>
               <li className="flex items-center gap-2">
                 <Gift className="h-4 w-4 text-primary" aria-hidden="true" /> Geschikt voor schoenen,

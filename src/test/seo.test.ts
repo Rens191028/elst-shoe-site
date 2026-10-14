@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { ARTICLES } from "@/data/articles";
 import { COLLECTIONS, PRODUCTS, seoDescription, seoTitle } from "@/lib/catalog";
 
 const sitemap = readFileSync("public/sitemap.xml", "utf8");
@@ -9,6 +10,11 @@ describe("sitemap", () => {
   it("bevat alle producten en collecties", () => {
     for (const p of PRODUCTS) expect(sitemap).toContain(`/products/${p.h}</loc>`);
     for (const c of COLLECTIONS) expect(sitemap).toContain(`/collectie/${c.slug}</loc>`);
+  });
+
+  it("bevat de kennisbank-artikelen", () => {
+    expect(sitemap).toContain("/kennisbank</loc>");
+    for (const a of ARTICLES) expect(sitemap).toContain(`/kennisbank/${a.slug}</loc>`);
   });
 
   it("wordt in robots.txt aangewezen en sluit privé-pagina's uit", () => {

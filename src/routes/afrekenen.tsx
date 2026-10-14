@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Info, Lock } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Check, Info, Lock, ShieldCheck } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { CutoffNotice } from "@/components/site/CutoffNotice";
 import { getProduct, money, variantLabel } from "@/lib/catalog";
 import { priceLines } from "@/lib/bundles";
 import { useCart } from "@/lib/cart";
@@ -67,6 +68,19 @@ function Checkout() {
   const digitalOnly = lines.length > 0 && lines.every((l) => l.product.g === "cadeaubon");
   const navigate = useNavigate();
   const [method, setMethod] = useState(METHODS[0]!);
+  const [step, setStep] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
+  const steps = digitalOnly ? ["Gegevens", "Betalen"] : ["Gegevens", "Verzending", "Betalen"];
+  const last = steps.length - 1;
+  const goNext = () => {
+    // Valideer alleen de velden van de stap waar je nu op zit
+    const fields = formRef.current?.querySelectorAll<HTMLInputElement>(
+      `[data-step="${step}"] input`,
+    );
+    for (const f of fields ?? []) if (!f.reportValidity()) return;
+    setStep((n) => Math.min(n + 1, last));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (lines.length === 0)
     return (
@@ -132,10 +146,54 @@ function Checkout() {
             </p>
           </div>
         )}
+        <ol
+          aria-label={`Stap ${step + 1} van ${steps.length}`}
+          className="mt-8 flex items-center gap-2 text-sm"
+        >
+          {steps.map((label, i) => (
+            <li
+              key={label}
+              className="flex items-center gap-2"
+              aria-current={i === step ? "step" : undefined}
+            >
+              {i > 0 && (
+                <span
+                  className={cn("h-px w-6 sm:w-12", i <= step ? "bg-ink" : "bg-border")}
+                  aria-hidden="true"
+                />
+              )}
+              <button
+                type="button"
+                disabled={i >= step}
+                onClick={() => setStep(i)}
+                className={cn(
+                  "flex items-center gap-2 rounded-full py-1 pr-3 pl-1 font-semibold",
+                  i === step ? "bg-ink text-white" : i < step ? "text-ink" : "text-soft",
+                )}
+              >
+                <span
+                  className={cn(
+                    "flex h-7 w-7 items-center justify-center rounded-full text-xs",
+                    i === step
+                      ? "bg-cta text-white"
+                      : i < step
+                        ? "bg-ink text-white"
+                        : "border border-border",
+                  )}
+                >
+                  {i < step ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : i + 1}
+                </span>
+                {label}
+              </button>
+            </li>
+          ))}
+        </ol>
         <form
+          ref={formRef}
           className="mt-8 grid gap-10 lg:grid-cols-[1fr_400px]"
           onSubmit={(e) => {
             e.preventDefault();
+            if (step < last) return goNext();
             try {
               sessionStorage.setItem(
                 "gs-last-order",
@@ -158,7 +216,7 @@ function Checkout() {
           }}
         >
           <div className="space-y-8">
-            <fieldset className="grid gap-4 sm:grid-cols-2">
+            <fieldset data-step="0" hidden={step !== 0} className="grid gap-4 sm:grid-cols-2">
               <legend className="mb-4 font-display text-xl font-bold">
                 {digitalOnly ? "Contact" : "Contact & bezorgadres"}
               </legend>
@@ -194,7 +252,22 @@ function Checkout() {
                 <input type="tel" autoComplete="tel" className={field} />
               </Field>
             </fieldset>
-            <fieldset>
+            {!digitalOnly && (
+              <fieldset data-step="1" hidden={step !== 1}>
+                <legend className="mb-4 font-display text-xl font-bold">Verzending</legend>
+                <div className="rounded-2xl border border-ink bg-white p-4 text-sm ring-1 ring-ink">
+                  <p className="flex justify-between font-semibold">
+                    <span>PostNL — standaard</span>
+                    <span>{price.shipping === 0 ? "Gratis" : money(price.shipping)}</span>
+                  </p>
+                  <p className="mt-1 text-muted-foreground">
+                    Gratis verzending vanaf {money(SITE.freeShippingFrom)}.
+                  </p>
+                </div>
+                <CutoffNotice className="mt-4" />
+              </fieldset>
+            )}
+            <fieldset data-step={last} hidden={step !== last}>
               <legend className="mb-4 font-display text-xl font-bold">Betaalmethode</legend>
               <div className="grid gap-3 sm:grid-cols-2">
                 {METHODS.map((m) => (
@@ -245,15 +318,29 @@ function Checkout() {
               ))}
             </ul>
             <PriceRows big className="border-t border-border pt-4" price={price} />
+            {!digitalOnly && step === last && <CutoffNotice />}
             <button
               type="submit"
               className="flex w-full items-center justify-center gap-2 rounded-full bg-cta py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]"
             >
-              <Lock className="h-4 w-4" /> Bestelling plaatsen
+              {step < last ? (
+                <>Verder naar {steps[step + 1]!.toLowerCase()}</>
+              ) : (
+                <>
+                  <Lock className="h-4 w-4" aria-hidden="true" /> Bestelling plaatsen
+                </>
+              )}
             </button>
-            <p className="text-center text-xs text-muted-foreground">
-              Incl. btw · Op werkdagen voor 15:00 besteld, dezelfde dag verzonden.
-            </p>
+            {step === last && (
+              <div className="flex gap-3 rounded-2xl border border-border bg-cream p-3.5 text-xs">
+                <ShieldCheck className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                <p>
+                  <strong className="block text-sm">Veilig betalen</strong>
+                  Betalen gaat via een beveiligde (SSL) verbinding met je bank of betaalprovider.
+                </p>
+              </div>
+            )}
+            <p className="text-center text-xs text-muted-foreground">Incl. btw</p>
           </aside>
         </form>
       </section>
