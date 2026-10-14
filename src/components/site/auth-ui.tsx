@@ -17,7 +17,7 @@ export function AuthShell({
     <section className="mx-auto flex max-w-md flex-col px-4 py-14 md:py-20">
       <h1 className="font-display text-4xl font-extrabold tracking-tight">{title}</h1>
       {intro && <div className="mt-3 text-muted-foreground">{intro}</div>}
-      <div className="mt-8 rounded-2xl border border-border bg-white p-6 md:p-8">{children}</div>
+      <div className="mt-8 rounded-2xl border border-border bg-white shadow-soft p-6 md:p-8">{children}</div>
     </section>
   );
 }

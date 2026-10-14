@@ -164,7 +164,7 @@ function Checkout() {
             </fieldset>
           </div>
 
-          <aside className="h-fit space-y-4 rounded-2xl border border-border bg-white p-6 lg:sticky lg:top-24">
+          <aside className="h-fit space-y-4 rounded-2xl border border-border bg-white shadow-soft p-6 lg:sticky lg:top-24">
             <h2 className="font-display text-xl font-bold">Je bestelling</h2>
             <ul className="divide-y divide-border">
               {lines.map((l) => (

@@ -20,6 +20,7 @@ import { Route as InloggenRouteImport } from './routes/inloggen'
 import { Route as MaatadviesRouteImport } from './routes/maatadvies'
 import { Route as OverOnsRouteImport } from './routes/over-ons'
 import { Route as RegistrerenRouteImport } from './routes/registreren'
+import { Route as VergelijkenRouteImport } from './routes/vergelijken'
 import { Route as VerzendingRetourRouteImport } from './routes/verzending-retour'
 import { Route as WachtwoordResettenRouteImport } from './routes/wachtwoord-resetten'
 import { Route as WachtwoordVergetenRouteImport } from './routes/wachtwoord-vergeten'
@@ -86,6 +87,11 @@ const RegistrerenRoute = RegistrerenRouteImport.update({
   path: '/registreren',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VergelijkenRoute = VergelijkenRouteImport.update({
+  id: '/vergelijken',
+  path: '/vergelijken',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerzendingRetourRoute = VerzendingRetourRouteImport.update({
   id: '/verzending-retour',
   path: '/verzending-retour',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/maatadvies': typeof MaatadviesRoute
   '/over-ons': typeof OverOnsRoute
   '/registreren': typeof RegistrerenRoute
+  '/vergelijken': typeof VergelijkenRoute
   '/verzending-retour': typeof VerzendingRetourRoute
   '/wachtwoord-resetten': typeof WachtwoordResettenRoute
   '/wachtwoord-vergeten': typeof WachtwoordVergetenRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/maatadvies': typeof MaatadviesRoute
   '/over-ons': typeof OverOnsRoute
   '/registreren': typeof RegistrerenRoute
+  '/vergelijken': typeof VergelijkenRoute
   '/verzending-retour': typeof VerzendingRetourRoute
   '/wachtwoord-resetten': typeof WachtwoordResettenRoute
   '/wachtwoord-vergeten': typeof WachtwoordVergetenRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/maatadvies': typeof MaatadviesRoute
   '/over-ons': typeof OverOnsRoute
   '/registreren': typeof RegistrerenRoute
+  '/vergelijken': typeof VergelijkenRoute
   '/verzending-retour': typeof VerzendingRetourRoute
   '/wachtwoord-resetten': typeof WachtwoordResettenRoute
   '/wachtwoord-vergeten': typeof WachtwoordVergetenRoute
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/maatadvies'
     | '/over-ons'
     | '/registreren'
+    | '/vergelijken'
     | '/verzending-retour'
     | '/wachtwoord-resetten'
     | '/wachtwoord-vergeten'
@@ -242,6 +252,7 @@ export interface FileRouteTypes {
     | '/maatadvies'
     | '/over-ons'
     | '/registreren'
+    | '/vergelijken'
     | '/verzending-retour'
     | '/wachtwoord-resetten'
     | '/wachtwoord-vergeten'
@@ -265,6 +276,7 @@ export interface FileRouteTypes {
     | '/maatadvies'
     | '/over-ons'
     | '/registreren'
+    | '/vergelijken'
     | '/verzending-retour'
     | '/wachtwoord-resetten'
     | '/wachtwoord-vergeten'
@@ -289,6 +301,7 @@ export interface RootRouteChildren {
   MaatadviesRoute: typeof MaatadviesRoute
   OverOnsRoute: typeof OverOnsRoute
   RegistrerenRoute: typeof RegistrerenRoute
+  VergelijkenRoute: typeof VergelijkenRoute
   VerzendingRetourRoute: typeof VerzendingRetourRoute
   WachtwoordResettenRoute: typeof WachtwoordResettenRoute
   WachtwoordVergetenRoute: typeof WachtwoordVergetenRoute
@@ -375,6 +388,13 @@ declare module '@tanstack/react-router' {
       path: '/registreren'
       fullPath: '/registreren'
       preLoaderRoute: typeof RegistrerenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vergelijken': {
+      id: '/vergelijken'
+      path: '/vergelijken'
+      fullPath: '/vergelijken'
+      preLoaderRoute: typeof VergelijkenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verzending-retour': {
@@ -477,6 +497,7 @@ const rootRouteChildren: RootRouteChildren = {
   MaatadviesRoute: MaatadviesRoute,
   OverOnsRoute: OverOnsRoute,
   RegistrerenRoute: RegistrerenRoute,
+  VergelijkenRoute: VergelijkenRoute,
   VerzendingRetourRoute: VerzendingRetourRoute,
   WachtwoordResettenRoute: WachtwoordResettenRoute,
   WachtwoordVergetenRoute: WachtwoordVergetenRoute,

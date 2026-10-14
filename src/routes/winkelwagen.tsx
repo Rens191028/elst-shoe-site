@@ -41,7 +41,7 @@ function CartPage() {
             <div>
               <ShippingBar
                 subtotal={subtotal}
-                className="rounded-2xl border border-border bg-white p-4"
+                className="rounded-2xl border border-border bg-white shadow-soft p-4"
               />
               <ul className="mt-2">
                 {lines.map((l) => (
@@ -52,7 +52,7 @@ function CartPage() {
                 <CrossSell items={suggestions} title="Vaak samen gekocht" />
               </div>
             </div>
-            <aside className="h-fit space-y-4 rounded-2xl border border-border bg-white p-6 lg:sticky lg:top-24">
+            <aside className="h-fit space-y-4 rounded-2xl border border-border bg-white shadow-soft p-6 lg:sticky lg:top-24">
               <h2 className="font-display text-xl font-bold">Overzicht</h2>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">

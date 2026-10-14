@@ -23,13 +23,13 @@ export const Route = createFileRoute("/contact")({
           <a
             key={c.l}
             href={c.h}
-            className="block rounded-2xl border border-border bg-white p-5 no-underline transition hover:-translate-y-0.5 hover:border-ink"
+            className="block rounded-2xl border border-border bg-white shadow-soft p-5 no-underline transition hover:-translate-y-0.5 hover:border-ink"
           >
             <p className="text-sm text-muted-foreground">{c.l}</p>
             <p className="font-display text-lg font-bold">{c.v}</p>
           </a>
         ))}
-        <div className="rounded-2xl border border-border bg-white p-5">
+        <div className="rounded-2xl border border-border bg-white shadow-soft p-5">
           <p className="text-sm text-muted-foreground">Adres</p>
           <p className="font-display text-lg font-bold">{SITE.address.street}</p>
           <p>

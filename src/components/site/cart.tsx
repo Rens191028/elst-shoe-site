@@ -32,6 +32,7 @@ export function ShippingBar({ subtotal, className }: { subtotal: number; classNa
       <div
         className="h-1.5 overflow-hidden rounded-full bg-border"
         role="progressbar"
+        aria-label="Voortgang gratis verzending"
         aria-valuenow={Math.round(pct)}
         aria-valuemin={0}
         aria-valuemax={100}

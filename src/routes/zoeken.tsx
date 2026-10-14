@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo } from "react";
 import { money, searchProducts } from "@/lib/catalog";
@@ -58,10 +58,30 @@ function SearchPage() {
         )}
         <div className="mt-8">
           {q && res.results.length === 0 ? (
-            <p className="py-16 text-center text-muted-foreground">
-              Niets gevonden. Probeer een kleur (“zwart”), soort (“sneakers”) of een prijs (“onder
-              €30”).
-            </p>
+            <div className="rounded-2xl border border-dashed border-border py-16 text-center">
+              <Search className="mx-auto h-10 w-10 text-soft" />
+              <p className="mt-3 font-display text-xl font-bold">Niets gevonden voor “{q}”</p>
+              <p className="mx-auto mt-1 max-w-md text-muted-foreground">
+                Probeer een kleur (“zwart”), een soort (“sneakers”) of een prijs (“onder €30”). Of
+                kijk gewoon rond.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                <Link
+                  to="/collectie/$slug"
+                  params={{ slug: "sale" }}
+                  className="rounded-full bg-cta px-6 py-3 text-sm font-semibold text-white"
+                >
+                  Bekijk de sale
+                </Link>
+                <Link
+                  to="/collectie/$slug"
+                  params={{ slug: "nieuw" }}
+                  className="rounded-full border border-ink px-6 py-3 text-sm font-semibold text-ink transition hover:bg-ink hover:text-white"
+                >
+                  Nieuw binnen
+                </Link>
+              </div>
+            </div>
           ) : (
             <ProductGrid products={res.results.slice(0, 48)} eagerCount={4} />
           )}

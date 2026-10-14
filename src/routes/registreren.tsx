@@ -67,7 +67,7 @@ function Register() {
         <Link
           to="/inloggen"
           search={{ ...(redirect ? { redirect } : {}), ...(reden ? { reden } : {}) }}
-          className="mt-6 flex h-12 items-center justify-center rounded-full bg-ink font-semibold text-white transition hover:bg-primary"
+          className="mt-6 flex h-12 items-center justify-center rounded-full bg-cta font-semibold text-white transition"
         >
           Naar inloggen
         </Link>

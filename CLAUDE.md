@@ -8,6 +8,8 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - **Geen Shopify**: geen koppeling, geen vermelding in code/copy. (Alleen de bestaande productfoto-URL's in de catalogus staan nog op het oude CDN; zie "Open punten".)
 - Catalogus: `src/data/products.json`, gegenereerd uit de xlsx met `python3 -I scripts/build-catalog.py <xlsx>` (normaliseert kleuren, categorieën en van-prijzen). Niet met de hand bewerken.
 - Winkelwagen: `src/lib/cart.tsx` (localStorage). Toevoegen opent de lade niet meer: de header-winkelwagen klapt kort uit tot een balk met aantal en totaal (`addTick`).
+- Vergelijken (max 3) en "eerder bekeken": `src/lib/shopper.tsx` (localStorage, geen account nodig); UI in `components/site/shopper-ui.tsx`, pagina `/vergelijken`.
+- SEO: `public/sitemap.xml` genereren met `node scripts/build-sitemap.mjs` na elke catalogus-update (`src/test/seo.test.ts` bewaakt de dekking). Titels/descriptions via `seoTitle`/`seoDescription`; OG-afbeelding `public/og-image.png`.
 - Voorraad: `src/lib/stock.ts` leest `src/data/stock.json` (`{handle: {maat: aantal}}`). De catalogus heeft alleen ja/nee; zonder aangeleverde aantallen wordt nooit een aantal getoond.
 - Accounts: Supabase Auth (e-mail + wachtwoord) via `src/lib/auth.tsx`; favorieten alleen met account (`src/lib/favorites.tsx`, geen gast-wishlist). Tabellen `profiles`, `favorites`, `orders` met RLS: zie `supabase/migrations/`. `src/integrations/supabase/*` is auto-gegenereerd, niet met de hand bewerken (behalve het bijwerken van `types.ts` na een migratie).
 - Bedrijfsgegevens en winkelregels: `src/lib/site.ts`.
@@ -20,6 +22,8 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 
 ## Regels
 
+- Knoppen: primair = `bg-cta` gevuld, secundair = `border border-ink` outline; donkere `bg-ink`-knoppen alleen op gekleurde vlakken. Accentkleur voor tekst: `text-primary-text` (contrast), `text-primary` alleen voor iconen/grote tekst/donkere vlakken.
+- Toegankelijkheid: houd axe (WCAG 2.1 AA) schoon; `--soft` is bewust donker genoeg voor kleine tekst.
 - Kaarten/panelen `rounded-2xl`, grote vlakken `rounded-3xl`, knoppen en pills `rounded-full`. Primaire CTA's gebruiken `bg-cta` (gradient). Secties wisselen wit / `bg-cream` / donker.
 - "Vaak samen gekocht"/cross-sell alleen binnen dezelfde categorie (`related`, `crossSell`).
 - Van-prijs alleen tonen bij echte korting (`Product.w` is anders null).
@@ -37,6 +41,8 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - Voorraadlabels ("nog maar X op voorraad", per maat) verschijnen pas als `src/data/stock.json` gevuld wordt of de voorraad uit een database komt.
 - Hero is één foto met pseudo-3D (slepen, zachte zwaai, scroll); een echt 360°-model vraagt om extra foto's of een 3D-bestand.
 - Mega-menu toont "Nieuw in …" i.p.v. "Populair in …" (geen verkoopdata).
+- Niet gebouwd uit het conversie-document, bewust: "X mensen bekeken dit"/"laatst besteld" (geen echte activiteitsdata; verzonnen cijfers zijn misleidend), track & trace (orders hebben geen vervoerder-/trackingvelden), verlaten-winkelwagen-mail en refer-a-friend (vragen een e-mailbackend), dark mode (nice to have).
+- "Retour aanvragen" in het account opent een voorgevuld e-mailtje (geen retourportaal).
 - Social-URL's invullen in `SITE.social`; ManyChat-widget nog niet geplaatst.
 - Productfoto's staan nog op het oude CDN: verhuizen naar eigen opslag; achtergrondverwerking pas na testbatch.
 - Data heeft één foto per product (geen hover-crossfade/swipe tussen foto's), geen verkoopdata (dus geen "Bestseller"-badge) en geen omschrijvingen (nu afgeleid uit titel).
