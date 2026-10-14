@@ -18,6 +18,7 @@ import { FavoritesProvider } from "@/lib/favorites";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/cart";
+import { ShopAssistant } from "@/components/site/ShopAssistant";
 
 function NotFoundComponent() {
   return (
@@ -159,6 +160,7 @@ function RootComponent() {
             </main>
             <Footer />
             <CartDrawer />
+            <ShopAssistant />
           </CartProvider>
         </FavoritesProvider>
       </AuthProvider>
