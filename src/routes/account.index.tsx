@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { money } from "@/lib/catalog";
 import { useAuth } from "@/lib/auth";
+import { SITE } from "@/lib/site";
 
 export const Route = createFileRoute("/account/")({ component: Orders });
 
@@ -16,6 +17,16 @@ const STATUS: Record<string, string> = {
   afgeleverd: "Afgeleverd",
   geannuleerd: "Geannuleerd",
 };
+/** Opent een voorgevuld retourbericht; er is nog geen retourportaal, dus dit gaat per e-mail. */
+function returnMailto(o: Order) {
+  const nr = o.id.slice(0, 8).toUpperCase();
+  const lines = o.items.map(
+    (it) => `- ${it.qty ?? 1}x ${it.title ?? it.handle}${it.size ? ` (maat ${it.size})` : ""}`,
+  );
+  const body = `Ik wil graag retourneren.\n\nBestelling: ${nr}\n${lines.join("\n")}\n\nReden van retour:\n`;
+  return `mailto:${SITE.email}?subject=${encodeURIComponent(`Retour bestelling ${nr}`)}&body=${encodeURIComponent(body)}`;
+}
+
 const date = new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" });
 
 function Orders() {
@@ -50,7 +61,7 @@ function Orders() {
     <div>
       <h2 className="font-display text-2xl font-bold">Mijn bestellingen</h2>
       {failed ? (
-        <p role="alert" className="mt-6 text-primary">
+        <p role="alert" className="mt-6 text-primary-text">
           Je bestellingen konden niet worden geladen. Probeer het later opnieuw.
         </p>
       ) : orders === null ? (
@@ -75,7 +86,7 @@ function Orders() {
       ) : (
         <ul className="mt-6 space-y-4">
           {orders.map((o) => (
-            <li key={o.id} className="rounded-2xl border border-border bg-white p-5">
+            <li key={o.id} className="rounded-2xl border border-border bg-white shadow-soft p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <p className="font-semibold">
@@ -102,7 +113,19 @@ function Orders() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-3 text-right font-bold">Totaal {money(o.total)}</p>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                {o.status !== "geannuleerd" ? (
+                  <a
+                    href={returnMailto(o)}
+                    className="rounded-full border border-ink px-5 py-2 text-sm font-semibold text-ink transition hover:bg-ink hover:text-white"
+                  >
+                    Retour aanvragen
+                  </a>
+                ) : (
+                  <span />
+                )}
+                <p className="font-bold">Totaal {money(o.total)}</p>
+              </div>
             </li>
           ))}
         </ul>

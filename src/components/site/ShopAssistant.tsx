@@ -40,6 +40,18 @@ const INFO: { re: RegExp; text: string }[] = [
     text: "Je kunt achteraf betalen met Klarna. Zo betaal je pas als je je bestelling binnen hebt.",
   },
   {
+    re: /welke maat|maattabel|maatadvies|maat advies|pasvorm|voetlengte|hoe groot|uitvalt/,
+    text: "Twijfel je over je maat? Meet je voet in cm en gebruik ons maatadvies (goedkopeschoenen.com/maatadvies), dat rekent de juiste maat voor je uit. Het is een advies, geen garantie. Op elke productpagina zie je welke maten er zijn.",
+  },
+  {
+    re: /inlog|inloggen|account|wachtwoord|registreer|registreren/,
+    text: "Met een account bewaar je favorieten en zie je je bestellingen. Inloggen of registreren kan via het account-icoon rechtsboven. Wachtwoord vergeten? Dat reset je op de inlogpagina.",
+  },
+  {
+    re: /vergelijk/,
+    text: "Je kunt 2 of 3 producten naast elkaar zetten met de knop “Vergelijk” onder een product. Daarna opent de vergelijkpagina.",
+  },
+  {
     re: /contact|bellen|telefoon|whatsapp|mail|adres|bereik|klantenservice|spreken/,
     text: `Je bereikt ons via ${SITE.phone}, WhatsApp of ${SITE.email}. Je vindt ons op ${SITE.address.street}, ${SITE.address.zip} ${SITE.address.city}.`,
   },

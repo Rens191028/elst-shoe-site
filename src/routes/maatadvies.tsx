@@ -57,7 +57,7 @@ function SizeAdvice() {
           ))}
         </ol>
 
-        <div className="mt-8 rounded-2xl border border-border bg-white p-6 md:p-8">
+        <div className="mt-8 rounded-2xl border border-border bg-white shadow-soft p-6 md:p-8">
           {step === 1 && (
             <div className="anim-fade-up">
               <h2 className="font-display text-xl font-bold">Stap 1 · Meet je voet</h2>
@@ -77,7 +77,7 @@ function SizeAdvice() {
                 />
               </label>
               {len && !valid && (
-                <p role="alert" className="mt-2 text-sm text-primary">
+                <p role="alert" className="mt-2 text-sm text-primary-text">
                   Vul een lengte tussen 20 en 31 cm in.
                 </p>
               )}
@@ -113,7 +113,7 @@ function SizeAdvice() {
           {step === 3 && size && (
             <div className="anim-fade-up text-center">
               <h2 className="font-display text-xl font-bold">Jouw advies</h2>
-              <p className="mt-4 font-display text-7xl font-extrabold text-primary">{size}</p>
+              <p className="mt-4 font-display text-7xl font-extrabold text-primary-text">{size}</p>
               <p className="mt-2 text-sm text-muted-foreground">
                 Voetlengte {cm.toLocaleString("nl-NL")} cm · pasvorm {fit}
               </p>
@@ -159,7 +159,7 @@ function SizeAdvice() {
               type="button"
               disabled={step === 1 && !valid}
               onClick={() => setStep((s) => s + 1)}
-              className="flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ink"
+              className="flex items-center gap-2 rounded-full bg-cta px-6 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40"
             >
               {step === 2 ? "Toon advies" : "Volgende"} <ArrowRight className="h-4 w-4" />
             </button>

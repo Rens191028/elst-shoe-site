@@ -15,6 +15,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
 import { FavoritesProvider } from "@/lib/favorites";
+import { ShopperProvider } from "@/lib/shopper";
+import { CompareTray } from "@/components/site/shopper-ui";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/cart";
@@ -102,6 +104,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "GoedkopeSchoenen.com" },
+      { property: "og:locale", content: "nl_NL" },
+      { property: "og:image", content: "https://goedkopeschoenen.com/og-image.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      {
+        property: "og:image:alt",
+        content: "GoedkopeSchoenen.com: betaalbare schoenen, tassen en accessoires",
+      },
+      { name: "twitter:image", content: "https://goedkopeschoenen.com/og-image.png" },
+      { name: "theme-color", content: "#fafaf8" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -116,6 +128,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..800&family=Inter:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "icon", href: "/favicon.ico", sizes: "any" },
     ],
   }),
@@ -146,22 +159,25 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <FavoritesProvider>
-          <CartProvider>
-            <a
-              href="#main"
-              className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-white"
-            >
-              Meteen naar de content
-            </a>
-            <Header />
-            <main id="main">
-              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-              <Outlet />
-            </main>
-            <Footer />
-            <CartDrawer />
-            <ShopAssistant />
-          </CartProvider>
+          <ShopperProvider>
+            <CartProvider>
+              <a
+                href="#main"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-white"
+              >
+                Meteen naar de content
+              </a>
+              <Header />
+              <main id="main">
+                {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                <Outlet />
+              </main>
+              <Footer />
+              <CartDrawer />
+              <CompareTray />
+              <ShopAssistant />
+            </CartProvider>
+          </ShopperProvider>
         </FavoritesProvider>
       </AuthProvider>
     </QueryClientProvider>

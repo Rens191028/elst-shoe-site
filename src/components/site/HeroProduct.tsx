@@ -116,7 +116,7 @@ export function HeroProduct({ product }: { product: Product }) {
         </Link>
         <div className="pointer-events-none absolute -left-4 bottom-8 hidden rounded-2xl bg-white px-4 py-3 shadow-lift [transform:translateZ(60px)] sm:block">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-soft">Nu</p>
-          <p className="font-display text-xl font-extrabold text-primary">{money(product.p)}</p>
+          <p className="font-display text-xl font-extrabold text-primary-text">{money(product.p)}</p>
           {product.w && <p className="text-xs text-soft line-through">{money(product.w)}</p>}
         </div>
         <div className="pointer-events-none absolute -right-3 top-8 hidden items-center gap-2 rounded-2xl bg-ink px-4 py-3 text-white shadow-lift [transform:translateZ(80px)] sm:flex">

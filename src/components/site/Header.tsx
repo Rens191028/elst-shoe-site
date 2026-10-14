@@ -80,7 +80,10 @@ function MegaPanel({ slug, onNavigate }: { slug: string; onNavigate: () => void 
   const feature = fresh[0];
   const row = fresh.slice(1, 5);
   return (
-    <div className="menu-panel absolute inset-x-0 top-full border-b border-border bg-background shadow-[0_24px_40px_-24px_rgba(20,20,19,0.25)]">
+    <div
+      data-mega-panel
+      className="menu-panel absolute inset-x-0 top-full border-b border-border bg-background shadow-[0_24px_40px_-24px_rgba(20,20,19,0.25)]"
+    >
       <div className="mx-auto grid max-w-7xl grid-cols-[1fr_280px] gap-10 px-6 py-8">
         <div className="grid grid-cols-3 gap-8">
           {MEGA[slug]?.map((col) => (
@@ -150,7 +153,7 @@ function MegaPanel({ slug, onNavigate }: { slug: string; onNavigate: () => void 
               to="/collectie/$slug"
               params={{ slug: "sale" }}
               onClick={onNavigate}
-              className="font-semibold text-primary underline-offset-4 hover:underline"
+              className="font-semibold text-primary-text underline-offset-4 hover:underline"
             >
               Bekijk de sale
             </Link>
@@ -303,7 +306,7 @@ function SearchDialog({
             <button
               type="button"
               onClick={() => go()}
-              className="mt-1 w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-primary hover:bg-secondary"
+              className="mt-1 w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-primary-text hover:bg-secondary"
             >
               Alle {found.results.length} resultaten bekijken →
             </button>
@@ -331,35 +334,45 @@ function CartButton() {
   }, [addTick]);
 
   const label = `${count} ${count === 1 ? "item" : "items"} · ${money(subtotal)}`;
+  // Het basisicoon (met aantal-badge) staat los van de uitklapbalk en blijft altijd zichtbaar.
+  // De balk schuift er alleen tijdelijk links van uit (clip-path), zonder het icoon te beïnvloeden.
   return (
     <div className="relative h-9 w-9 sm:h-10 sm:w-10">
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden="true"
+        onClick={() => setOpen(true)}
+        className={cn(
+          "absolute right-0 top-0 flex h-full items-center whitespace-nowrap rounded-full bg-cta pl-4 pr-10 text-xs font-semibold text-white shadow-lift transition-[clip-path] duration-300 ease-out motion-reduce:transition-none",
+          expanded
+            ? "[clip-path:inset(0_0_0_0)]"
+            : "pointer-events-none [clip-path:inset(0_0_0_100%)]",
+        )}
+      >
+        {label}
+      </button>
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`Winkelwagen, ${label}`}
         className={cn(
-          "absolute right-0 top-0 z-10 flex h-full items-center justify-end overflow-hidden rounded-full text-ink transition-[max-width,background-color,color,box-shadow] duration-300 ease-out motion-reduce:transition-none",
-          expanded
-            ? "max-w-[240px] bg-cta pl-4 text-white shadow-lift"
-            : "max-w-9 hover:bg-secondary sm:max-w-10",
+          iconBtn,
+          "relative z-10 h-full w-full transition-colors",
+          expanded && "text-white hover:bg-transparent",
         )}
       >
-        <span
-          className={cn(
-            "whitespace-nowrap text-xs font-semibold transition-opacity duration-200",
-            expanded ? "pr-1.5 opacity-100" : "w-0 opacity-0",
-          )}
-        >
-          {label}
-        </span>
-        <span className="relative flex h-9 w-9 shrink-0 items-center justify-center sm:h-10 sm:w-10">
-          <ShoppingBag className="h-5 w-5" />
-          {count > 0 && !expanded && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white">
-              {count}
-            </span>
-          )}
-        </span>
+        <ShoppingBag className="h-5 w-5" />
+        {count > 0 && (
+          <span
+            className={cn(
+              "absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white ring-2 ring-background transition-opacity duration-200",
+              expanded && "opacity-0",
+            )}
+          >
+            {count}
+          </span>
+        )}
       </button>
       <span className="sr-only" role="status" aria-live="polite">
         {expanded ? `Toegevoegd aan winkelwagen. ${label}` : ""}
@@ -417,7 +430,16 @@ export function Header() {
     return () => window.removeEventListener("scroll", on);
   }, []);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenu(null);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMenu((m) => {
+        if (m)
+          document
+            .querySelector<HTMLElement>(`nav[aria-label="Hoofdmenu"] a[aria-expanded="true"]`)
+            ?.focus();
+        return null;
+      });
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
@@ -443,6 +465,9 @@ export function Header() {
             : "border-transparent bg-background",
         )}
         onMouseLeave={scheduleClose}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setMenu(null);
+        }}
       >
         <div
           className={cn(
@@ -473,6 +498,17 @@ export function Header() {
                   params={{ slug: g.slug }}
                   onClick={() => setMenu(null)}
                   aria-expanded={menu === g.slug}
+                  aria-haspopup="true"
+                  onKeyDown={(e) => {
+                    // Pijl omlaag gaat het uitklapmenu in; Escape (hieronder) sluit het weer
+                    if (e.key === "ArrowDown") {
+                      e.preventDefault();
+                      openMenu(g.slug);
+                      requestAnimationFrame(() =>
+                        document.querySelector<HTMLElement>("[data-mega-panel] a")?.focus(),
+                      );
+                    }
+                  }}
                   className="flex items-center gap-1 px-4 py-2 text-[0.95rem] font-semibold text-ink"
                 >
                   <span className="link-underline" data-active={menu === g.slug}>
@@ -491,7 +527,7 @@ export function Header() {
               to="/collectie/$slug"
               params={{ slug: "sale" }}
               onMouseEnter={() => openMenu(null)}
-              className="px-4 py-2 text-[0.95rem] font-semibold text-primary"
+              className="px-4 py-2 text-[0.95rem] font-semibold text-primary-text"
             >
               <span className="link-underline">Sale</span>
             </Link>
@@ -578,7 +614,7 @@ export function Header() {
               </details>
             ))}
             {[
-              { to: "/collectie/$slug", slug: "sale", label: "Sale", cls: "text-primary" },
+              { to: "/collectie/$slug", slug: "sale", label: "Sale", cls: "text-primary-text" },
               { to: "/collectie/$slug", slug: "nieuw", label: "Nieuw binnen", cls: "" },
             ].map((l) => (
               <Link

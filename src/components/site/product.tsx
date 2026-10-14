@@ -5,6 +5,7 @@ import { discountPct, img, isNew, money, type Product } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
 import { lowStock, lowStockLabel } from "@/lib/stock";
+import { CompareButton } from "@/components/site/shopper-ui";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/site/motion";
@@ -66,7 +67,7 @@ export function Price({ product, size = "md" }: { product: Product; size?: "md" 
       <span
         className={cn(
           "font-bold",
-          product.w ? "text-primary" : "text-ink",
+          product.w ? "text-primary-text" : "text-ink",
           size === "lg" ? "text-2xl" : "text-[0.95rem]",
         )}
       >
@@ -225,8 +226,11 @@ export function ProductCard({
         </h3>
         <Price product={product} />
         {lowStock(product) !== undefined && (
-          <p className="text-xs font-semibold text-primary">{lowStockLabel(lowStock(product)!)}</p>
+          <p className="text-xs font-semibold text-primary-text">
+            {lowStockLabel(lowStock(product)!)}
+          </p>
         )}
+        <CompareButton handle={product.h} className="pt-1" />
         {list && (
           <p className="pt-1 text-sm text-muted-foreground">
             {product.k.length > 0 && <span>{product.k.join(", ")}</span>}

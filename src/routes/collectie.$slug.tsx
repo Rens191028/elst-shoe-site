@@ -86,6 +86,29 @@ export const Route = createFileRoute("/collectie/$slug")({
         { property: "og:description", content: desc },
       ],
       links: [{ rel: "canonical", href: `${SITE.url}/collectie/${params.slug}` }],
+      scripts: c
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { name: "Home", item: SITE.url },
+                  ...(c.cat && c.group && getCollection(c.group)
+                    ? [
+                        {
+                          name: getCollection(c.group)!.title,
+                          item: `${SITE.url}/collectie/${c.group}`,
+                        },
+                      ]
+                    : []),
+                  { name: c.title, item: `${SITE.url}/collectie/${c.slug}` },
+                ].map((e, i) => ({ "@type": "ListItem", position: i + 1, ...e })),
+              }),
+            },
+          ]
+        : [],
     };
   },
   notFoundComponent: () => (
@@ -285,7 +308,7 @@ function CollectionPage() {
               <button
                 type="button"
                 onClick={() => void navigate({ search: {}, replace: true })}
-                className="mt-5 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white"
+                className="mt-5 rounded-full bg-cta px-6 py-3 text-sm font-semibold text-white"
               >
                 Filters wissen
               </button>

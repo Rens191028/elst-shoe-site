@@ -41,7 +41,7 @@ function Thanks() {
       )}
       <Link
         to="/"
-        className="anim-fade-up mt-8 inline-block rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary"
+        className="anim-fade-up mt-8 inline-block rounded-full bg-cta px-7 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5"
         style={{ "--i": 4 } as React.CSSProperties}
       >
         Terug naar de winkel

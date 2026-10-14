@@ -360,3 +360,17 @@ export function searchProducts(query: string): SearchResult {
 
 export const shippingFor = (subtotal: number) =>
   subtotal === 0 ? 0 : subtotal >= SITE.freeShippingFrom ? 0 : SITE.shippingCost;
+
+/** Title-tag: merknaam erachter als het past, anders alleen de titel (afgekort tot ~70 tekens). */
+export function seoTitle(title: string, brand = "GoedkopeSchoenen.com", max = 70): string {
+  const full = `${title} | ${brand}`;
+  if (full.length <= max) return full;
+  if (title.length <= max) return title;
+  return title.slice(0, max - 1).replace(/\s+\S*$/, "") + "…";
+}
+
+/** Meta-description: afgekapt op ~160 tekens, op een woordgrens. */
+export function seoDescription(text: string, max = 160): string {
+  if (text.length <= max) return text;
+  return text.slice(0, max - 1).replace(/\s+\S*$/, "") + "…";
+}

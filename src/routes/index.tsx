@@ -23,6 +23,7 @@ import {
 import { REVIEWS, SITE, UGC } from "@/lib/site";
 import { CountUp, Reveal } from "@/components/site/motion";
 import { Tilt } from "@/components/site/Tilt";
+import { RecentlyViewed } from "@/components/site/shopper-ui";
 import { HeroProduct } from "@/components/site/HeroProduct";
 import { Deco3D, Floaty } from "@/components/site/decor";
 import { KiyohBadge, Photo, ProductCard } from "@/components/site/product";
@@ -169,7 +170,7 @@ function Index() {
               className="anim-fade-up mt-6 text-balance font-display text-[2.6rem] font-extrabold leading-[1.02] tracking-tight text-ink sm:text-6xl lg:text-7xl"
               style={{ "--i": 1 } as React.CSSProperties}
             >
-              Mooie schoenen vanaf <span className="text-primary">€8,99</span>
+              Mooie schoenen vanaf <span className="text-primary-text">€8,99</span>
             </h1>
             <p
               className="anim-fade-up mx-auto mt-5 max-w-lg text-lg text-muted-foreground lg:mx-0"
@@ -426,7 +427,7 @@ function Index() {
                 { n: SUBS.length, l: "categorieën" },
               ].map((x) => (
                 <Reveal key={x.l} className="rounded-2xl bg-cream p-4 text-center shadow-soft">
-                  <dd className="font-display text-3xl font-extrabold text-primary">
+                  <dd className="font-display text-3xl font-extrabold text-primary-text">
                     <CountUp to={x.n} />
                   </dd>
                   <dt className="mt-1 text-xs text-muted-foreground">{x.l}</dt>
@@ -464,7 +465,7 @@ function Index() {
         <div className="mx-auto max-w-7xl px-4 lg:px-6">
           <div className="grid items-center gap-10 lg:grid-cols-[360px_1fr]">
             <Reveal className="rounded-3xl bg-white p-8 text-center shadow-lift">
-              <p className="font-display text-7xl font-extrabold text-primary">
+              <p className="font-display text-7xl font-extrabold text-primary-text">
                 <CountUp to={SITE.kiyoh.score} decimals={1} />
               </p>
               <p className="mt-1 text-sm text-muted-foreground">gemiddeld op een schaal van 10</p>
@@ -490,7 +491,9 @@ function Index() {
             <div>
               <h2 id="trust-h" className="font-display text-3xl tracking-tight md:text-5xl">
                 Klanten waarderen ons met een{" "}
-                <span className="text-primary">{SITE.kiyoh.score.toLocaleString("nl-NL")}</span>
+                <span className="text-primary-text">
+                  {SITE.kiyoh.score.toLocaleString("nl-NL")}
+                </span>
               </h2>
               {REVIEWS.length > 0 ? (
                 <div className="snap-row -mx-4 mt-8 flex gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0">
@@ -498,9 +501,9 @@ function Index() {
                     <Reveal
                       key={r.name}
                       index={i}
-                      className="w-[82%] shrink-0 rounded-2xl border border-border bg-white p-6 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary/50 md:w-auto"
+                      className="w-[82%] shrink-0 rounded-2xl border border-border bg-white shadow-soft p-6 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary/50 md:w-auto"
                     >
-                      <p className="text-primary" aria-label={`${r.stars} van 5 sterren`}>
+                      <p className="text-primary-text" aria-label={`${r.stars} van 5 sterren`}>
                         {"★".repeat(r.stars)}
                       </p>
                       <p className="mt-3">“{r.text}”</p>
@@ -523,6 +526,8 @@ function Index() {
         </div>
       </section>
 
+      <RecentlyViewed className="mx-auto max-w-7xl px-4 pt-20 lg:px-6" />
+
       {/* Maatadvies */}
       <section className="mx-auto max-w-7xl px-4 pt-20 lg:px-6">
         <div className="flex flex-col items-start justify-between gap-6 rounded-3xl bg-secondary p-8 md:flex-row md:items-center md:p-12">
@@ -539,7 +544,7 @@ function Index() {
           </div>
           <Link
             to="/maatadvies"
-            className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary"
+            className="rounded-full bg-cta px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"
           >
             Naar het maatadvies
           </Link>

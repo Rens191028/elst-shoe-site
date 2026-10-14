@@ -1,14 +1,26 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Check, CreditCard, Link2, PackageCheck, Ruler, Truck } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { discountPct, getCollection, getProduct, img, related, SUBS, money } from "@/lib/catalog";
+import {
+  discountPct,
+  getCollection,
+  getProduct,
+  img,
+  money,
+  related,
+  seoDescription,
+  seoTitle,
+  SUBS,
+} from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
+import { useShopper } from "@/lib/shopper";
+import { CompareButton, RecentlyViewed } from "@/components/site/shopper-ui";
 import { LOW_STOCK, sizeStock } from "@/lib/stock";
 import { SITE } from "@/lib/site";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
@@ -33,8 +45,10 @@ export const Route = createFileRoute("/products/$handle")({
   head: ({ params }) => {
     const p = getProduct(params.handle);
     if (!p) return {};
-    const title = `${p.t} — ${money(p.p)} | GoedkopeSchoenen.com`;
-    const desc = `${p.t} voor ${money(p.p)}${p.w ? ` (van ${money(p.w)})` : ""}. Op werkdagen voor 15:00 besteld, dezelfde dag verzonden. Gratis verzending vanaf €65.`;
+    const title = seoTitle(p.t);
+    const desc = seoDescription(
+      `${p.t} voor ${money(p.p)}${p.w ? ` (van ${money(p.w)})` : ""}. Op werkdagen voor 15:00 besteld, dezelfde dag verzonden. Gratis verzending vanaf €65.`,
+    );
     const url = `${SITE.url}/products/${p.h}`;
     return {
       meta: [
@@ -52,7 +66,30 @@ export const Route = createFileRoute("/products/$handle")({
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { name: "Home", item: SITE.url },
+              ...(getCollection(p.g)
+                ? [{ name: getCollection(p.g)!.title, item: `${SITE.url}/collectie/${p.g}` }]
+                : []),
+              ...(SUBS.find((x) => x.cat === p.c)
+                ? [
+                    {
+                      name: SUBS.find((x) => x.cat === p.c)!.title,
+                      item: `${SITE.url}/collectie/${p.c}`,
+                    },
+                  ]
+                : []),
+              { name: p.t, item: url },
+            ].map((e, i) => ({ "@type": "ListItem", position: i + 1, ...e })),
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
             "@type": "Product",
+            sku: p.h,
             name: p.t,
             image: [p.i],
             brand: { "@type": "Brand", name: SITE.name },
@@ -97,6 +134,8 @@ function ProductPage() {
   const { handle } = Route.useParams();
   const p = getProduct(handle)!;
   const { add, subtotal } = useCart();
+  const { markViewed } = useShopper();
+  useEffect(() => markViewed(p.h), [p.h, markViewed]);
   const [size, setSize] = useState("");
   const [warn, setWarn] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -145,7 +184,7 @@ function ProductPage() {
         ]}
       />
       <article className="mx-auto grid max-w-7xl gap-10 px-4 py-8 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:px-6">
-        <div className="relative lg:sticky lg:top-24 lg:self-start">
+        <div className="relative lg:col-start-1 lg:row-start-1">
           <Tilt max={9}>
             <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-secondary">
               <Photo
@@ -163,7 +202,7 @@ function ProductPage() {
           </Tilt>
         </div>
 
-        <div>
+        <div className="lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto lg:pr-1">
           <p className="text-sm font-semibold uppercase tracking-widest text-soft">
             {sub?.title ?? group?.title}
           </p>
@@ -173,7 +212,7 @@ function ProductPage() {
           <div className="mt-4 flex items-center gap-3">
             <Price product={p} size="lg" />
             {pct > 0 && (
-              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary-text">
                 Je bespaart {money(p.w! - p.p)}
               </span>
             )}
@@ -229,7 +268,7 @@ function ProductPage() {
                         {m}
                       </button>
                       {left !== undefined && left > 0 && left <= LOW_STOCK && (
-                        <span className="text-[11px] font-semibold leading-none text-primary">
+                        <span className="text-[11px] font-semibold leading-none text-primary-text">
                           nog {left}
                         </span>
                       )}
@@ -238,7 +277,7 @@ function ProductPage() {
                 })}
               </div>
               {warn && (
-                <p role="alert" className="mt-2 text-sm font-medium text-primary">
+                <p role="alert" className="mt-2 text-sm font-medium text-primary-text">
                   Kies eerst je maat.
                 </p>
               )}
@@ -256,10 +295,17 @@ function ProductPage() {
 
           <ShippingBar
             subtotal={subtotal + (p.s ? p.p : 0)}
-            className="mt-5 rounded-2xl border border-border bg-white p-4"
+            className="mt-5 rounded-2xl border border-border bg-white shadow-soft p-4"
           />
 
-          <ul className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
+          <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+            <Truck className="h-4 w-4 text-primary" aria-hidden="true" />
+            Voor 15:00 besteld, vandaag verzonden · 30 dagen retour
+          </p>
+        </div>
+
+        <div className="lg:col-start-1 lg:row-start-2">
+          <ul className="mb-6 grid gap-3 text-sm sm:grid-cols-3">
             <li className="rounded-2xl bg-secondary p-4">
               <Truck className="mb-2 h-5 w-5 text-primary" />
               <p className="font-semibold">Dezelfde dag verzonden</p>
@@ -282,8 +328,7 @@ function ProductPage() {
               </p>
             </li>
           </ul>
-
-          <Accordion type="multiple" defaultValue={["omschrijving"]} className="mt-6">
+          <Accordion type="multiple" defaultValue={["omschrijving"]}>
             <AccordionItem value="omschrijving">
               <AccordionTrigger className="font-display text-base font-bold">
                 Omschrijving
@@ -345,14 +390,17 @@ function ProductPage() {
             </AccordionItem>
           </Accordion>
 
-          <button
-            type="button"
-            onClick={copy}
-            className="mt-4 flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-ink"
-          >
-            {copied ? <Check className="h-4 w-4 text-primary" /> : <Link2 className="h-4 w-4" />}
-            {copied ? "Link gekopieerd" : "Link kopiëren"}
-          </button>
+          <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
+            <button
+              type="button"
+              onClick={copy}
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-ink"
+            >
+              {copied ? <Check className="h-4 w-4 text-primary" /> : <Link2 className="h-4 w-4" />}
+              {copied ? "Link gekopieerd" : "Link kopiëren"}
+            </button>
+            <CompareButton handle={p.h} className="text-sm" />
+          </div>
         </div>
       </article>
 
@@ -367,6 +415,7 @@ function ProductPage() {
           <ProductGrid products={together} />
         </section>
       )}
+      <RecentlyViewed exclude={p.h} className="mx-auto max-w-7xl px-4 pt-14 lg:px-6" />
     </>
   );
 }

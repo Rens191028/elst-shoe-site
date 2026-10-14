@@ -29,7 +29,7 @@ function Newsletter() {
       <div className="hero-surface relative overflow-hidden rounded-3xl border border-border px-6 py-10 md:px-12 md:py-12">
         <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
           <div className="min-w-0">
-            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary-text">
               Nieuwsbrief
             </p>
             <h2 id="nl-title" className="font-display text-3xl font-extrabold md:text-4xl">
@@ -53,7 +53,7 @@ function Newsletter() {
               </p>
               <p className="mt-3 text-sm text-muted-foreground">Jouw kortingscode:</p>
               <div className="mt-1.5 flex items-center gap-2">
-                <code className="flex-1 rounded-2xl border-2 border-dashed border-primary bg-background px-4 py-2.5 text-center font-display text-xl font-extrabold tracking-widest text-primary">
+                <code className="flex-1 rounded-2xl border-2 border-dashed border-primary bg-background px-4 py-2.5 text-center font-display text-xl font-extrabold tracking-widest text-primary-text">
                   {CODE}
                 </code>
                 <button
@@ -104,7 +104,7 @@ function Newsletter() {
                 </button>
               </div>
               <p
-                className={`mt-2 px-3 text-xs ${state === "error" ? "text-primary" : "text-muted-foreground"}`}
+                className={`mt-2 px-3 text-xs ${state === "error" ? "text-primary-text" : "text-muted-foreground"}`}
               >
                 {state === "error"
                   ? "Inschrijven lukte niet. Controleer je e-mailadres en probeer het opnieuw."
@@ -164,6 +164,7 @@ export function Footer() {
               ) : (
                 <span
                   key={s.key}
+                  role="img"
                   aria-label={`${s.label} (binnenkort)`}
                   title="Binnenkort"
                   className={`${socialCls} opacity-60`}
