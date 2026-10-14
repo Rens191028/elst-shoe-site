@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
   type ReactNode,
+  type Context as ReactContext,
 } from "react";
 import { getProduct, shippingFor, type Product } from "@/lib/catalog";
 
@@ -28,7 +29,9 @@ type Ctx = {
   clear: () => void;
 };
 
-const CartContext = createContext<Ctx | null>(null);
+// Stabiel over hot-reloads heen: anders verwijzen al geladen componenten naar een oude context.
+const g = globalThis as unknown as { __gsCartCtx?: ReactContext<Ctx | null> };
+const CartContext = (g.__gsCartCtx ??= createContext<Ctx | null>(null));
 const CART_KEY = "gs-cart-v1";
 
 function load<T>(key: string, fallback: T): T {
