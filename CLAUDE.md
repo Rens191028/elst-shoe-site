@@ -7,7 +7,8 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - TanStack Start (React 19, file-routes in `src/routes`), Tailwind v4, shadcn/ui, Lovable-gekoppeld (geen git-history herschrijven).
 - **Geen Shopify**: geen koppeling, geen vermelding in code/copy. (Alleen de bestaande productfoto-URL's in de catalogus staan nog op het oude CDN; zie "Open punten".)
 - Catalogus: `src/data/products.json`, gegenereerd uit de xlsx met `python3 -I scripts/build-catalog.py <xlsx>` (normaliseert kleuren, categorieën en van-prijzen). Niet met de hand bewerken.
-- Winkelwagen: `src/lib/cart.tsx` (localStorage).
+- Winkelwagen: `src/lib/cart.tsx` (localStorage). Toevoegen opent de lade niet meer: de header-winkelwagen klapt kort uit tot een balk met aantal en totaal (`addTick`).
+- Voorraad: `src/lib/stock.ts` leest `src/data/stock.json` (`{handle: {maat: aantal}}`). De catalogus heeft alleen ja/nee; zonder aangeleverde aantallen wordt nooit een aantal getoond.
 - Accounts: Supabase Auth (e-mail + wachtwoord) via `src/lib/auth.tsx`; favorieten alleen met account (`src/lib/favorites.tsx`, geen gast-wishlist). Tabellen `profiles`, `favorites`, `orders` met RLS: zie `supabase/migrations/`. `src/integrations/supabase/*` is auto-gegenereerd, niet met de hand bewerken (behalve het bijwerken van `types.ts` na een migratie).
 - Bedrijfsgegevens en winkelregels: `src/lib/site.ts`.
 
@@ -15,7 +16,7 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 
 - Tokens in `src/styles.css`: achtergrond `#FAFAF8`, tekst `#141413`, accent terracotta `#B5582E` (hover `#99471F`). Accent spaarzaam: CTA's, sale-badges, highlights.
 - Archivo (koppen/logo, 800, iets verbreed via `font-stretch: 112%`) + Inter (body, 400). Logo "Tempo": drie gekantelde staafjes + wordmark (`components/site/Logo.tsx`, `public/favicon.svg`).
-- Animaties 200–400ms, rustig, respecteer `prefers-reduced-motion`. Geen autoplay-carrousels, nep-urgentie (countdowns zonder echte einddatum) of pop-ups. 3D-tilt alleen op hero en productpagina.
+- Animaties 200–400ms, rustig, respecteer `prefers-reduced-motion`. Geen autoplay-carrousels, nep-urgentie (countdowns zonder echte einddatum) of pop-ups. 3D-tilt/pseudo-3D alleen op hero, categorietegels (licht) en productpagina; het zwevende merkicoon (`Deco3D`) is puur decoratief.
 
 ## Regels
 
@@ -33,6 +34,9 @@ Werkafspraken voor wie (mens of Claude) aan deze site bouwt.
 - `orders` wordt pas gevuld als de checkout een backend heeft (nu alleen lezen voor gebruikers).
 - Instagram/UGC-strook (bij de sale) verschijnt zodra `UGC` in `site.ts` gevuld is; Kiyoh-profiel-URL in `SITE.kiyoh.url` maakt de badges klikbaar.
 - Nog niet gedaan uit het homepage-document: sorteren op "populair" (geen verkoopdata), merkfilter (alle producten hebben hetzelfde merk) en een echte sale-countdown (geen einddatum bekend).
+- Voorraadlabels ("nog maar X op voorraad", per maat) verschijnen pas als `src/data/stock.json` gevuld wordt of de voorraad uit een database komt.
+- Hero is één foto met pseudo-3D (slepen, zachte zwaai, scroll); een echt 360°-model vraagt om extra foto's of een 3D-bestand.
+- Mega-menu toont "Nieuw in …" i.p.v. "Populair in …" (geen verkoopdata).
 - Social-URL's invullen in `SITE.social`; ManyChat-widget nog niet geplaatst.
 - Productfoto's staan nog op het oude CDN: verhuizen naar eigen opslag; achtergrondverwerking pas na testbatch.
 - Data heeft één foto per product (geen hover-crossfade/swipe tussen foto's), geen verkoopdata (dus geen "Bestseller"-badge) en geen omschrijvingen (nu afgeleid uit titel).

@@ -19,6 +19,8 @@ type Ctx = {
   shipping: number;
   total: number;
   open: boolean;
+  /** Telt op bij elk toevoegen (niet bij aantal wijzigen); de header animeert hierop. */
+  addTick: number;
   setOpen: (v: boolean) => void;
   add: (h: string, size: string, qty?: number) => void;
   setQty: (h: string, size: string, qty: number) => void;
@@ -48,6 +50,7 @@ function save(key: string, value: unknown) {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [raw, setRaw] = useState<CartLine[]>([]);
   const [open, setOpen] = useState(false);
+  const [addTick, setAddTick] = useState(0);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -65,7 +68,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return cur.map((l, idx) => (idx === i ? { ...l, qty: Math.min(10, l.qty + qty) } : l));
       return [...cur, { h, size, qty }];
     });
-    setOpen(true);
+    setAddTick((t) => t + 1); // de header bevestigt het toevoegen; de lade opent niet meer vanzelf
   }, []);
   const setQty = useCallback((h: string, size: string, qty: number) => {
     setRaw((cur) =>
@@ -95,13 +98,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       shipping,
       total: Math.round((subtotal + shipping) * 100) / 100,
       open,
+      addTick,
       setOpen,
       add,
       setQty,
       remove,
       clear,
     };
-  }, [raw, open, add, setQty, remove, clear]);
+  }, [raw, open, addTick, add, setQty, remove, clear]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

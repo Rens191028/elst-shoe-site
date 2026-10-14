@@ -4,6 +4,7 @@ import { Heart, ImageOff, Plus, Check, Star } from "lucide-react";
 import { discountPct, img, isNew, money, type Product } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
+import { lowStock, lowStockLabel } from "@/lib/stock";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/site/motion";
@@ -223,6 +224,9 @@ export function ProductCard({
           </Link>
         </h3>
         <Price product={product} />
+        {lowStock(product) !== undefined && (
+          <p className="text-xs font-semibold text-primary">{lowStockLabel(lowStock(product)!)}</p>
+        )}
         {list && (
           <p className="pt-1 text-sm text-muted-foreground">
             {product.k.length > 0 && <span>{product.k.join(", ")}</span>}
