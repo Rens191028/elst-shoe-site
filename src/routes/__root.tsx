@@ -21,24 +21,40 @@ import { RippleInit, ScrollProgress } from "@/components/site/motion-extras";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/cart";
+import { IconSneaker } from "@/components/site/icons";
 import { ExitIntent } from "@/components/site/ExitIntent";
 import { ShopAssistant } from "@/components/site/ShopAssistant";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="relative isolate flex min-h-[70vh] items-center justify-center overflow-hidden px-4 py-20">
+      <div className="mesh" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Pagina niet gevonden</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Deze pagina bestaat niet (meer). Bekijk onze nieuwste collectie.
+        <IconSneaker className="shoe-hop mx-auto h-14 w-14 text-primary" />
+        <p className="mt-4 font-display text-8xl font-extrabold tracking-tight text-ink">
+          4<span className="text-primary-text">0</span>4
         </p>
-        <div className="mt-6">
+        <h1 className="mt-2 font-display text-2xl font-bold">Deze schoen past hier niet</h1>
+        <p className="mt-2 text-muted-foreground">
+          Deze pagina bestaat niet (meer). Geen zorgen: onze nieuwste collectie staat voor je klaar.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center rounded-full bg-cta px-7 py-3.5 font-semibold text-white transition hover:-translate-y-0.5 active:scale-[0.98]"
           >
-            Naar de homepage
+            Terug naar de homepage
+          </Link>
+          <Link
+            to="/collectie/$slug"
+            params={{ slug: "nieuw" }}
+            className="inline-flex items-center rounded-full border border-ink px-7 py-3.5 font-semibold text-ink transition hover:bg-ink hover:text-white"
+          >
+            Bekijk het nieuwste
           </Link>
         </div>
       </div>

@@ -1,21 +1,18 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { ArrowUp, SlidersHorizontal, LayoutGrid, List, X } from "lucide-react";
 import {
-  ArrowUp,
-  Briefcase,
-  Footprints,
-  Gem,
-  Home,
-  LayoutGrid,
-  List,
-  Mountain,
-  Shapes,
-  ShoppingBag,
-  SlidersHorizontal,
-  Wallet,
-  X,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
+  IconBag,
+  IconBigBag,
+  IconBoot,
+  IconBox,
+  IconGem,
+  IconSlipper,
+  IconSneaker,
+  IconTrail,
+  IconWallet,
+} from "@/components/site/icons";
+
+type LucideIcon = (props: React.SVGProps<SVGSVGElement>) => React.ReactNode;
 import { useEffect, useMemo, useState } from "react";
 import { collapseVariants } from "@/lib/variants";
 import {
@@ -147,20 +144,20 @@ const PAGE = 24;
 
 /** Zachte accentkleur per hoofdcategorie (donker genoeg voor witte tekst); sale/nieuw houden de huisstijl. */
 const THEME: Record<string, { color: string; tint: string; Icon: LucideIcon }> = {
-  schoenen: { color: "#7a5238", tint: "#f3ebe3", Icon: Footprints },
-  tassen: { color: "#b8603c", tint: "#f8e9df", Icon: ShoppingBag },
-  accessoires: { color: "#8a6d1f", tint: "#f5eedb", Icon: Gem },
+  schoenen: { color: "#7a5238", tint: "#f3ebe3", Icon: IconBoot },
+  tassen: { color: "#b8603c", tint: "#f8e9df", Icon: IconBag },
+  accessoires: { color: "#8a6d1f", tint: "#f5eedb", Icon: IconGem },
 };
 const SUB_ICON: Record<string, LucideIcon> = {
-  laarzen: Footprints,
-  sneakers: Zap,
-  "boots-festival": Mountain,
-  pantoffels: Home,
-  "overig-schoenen": Shapes,
-  schoudertasjes: ShoppingBag,
-  "grote-tassen": Briefcase,
-  portemonnees: Wallet,
-  sieraden: Gem,
+  laarzen: IconBoot,
+  sneakers: IconSneaker,
+  "boots-festival": IconTrail,
+  pantoffels: IconSlipper,
+  "overig-schoenen": IconBox,
+  schoudertasjes: IconBag,
+  "grote-tassen": IconBigBag,
+  portemonnees: IconWallet,
+  sieraden: IconGem,
 };
 const catBtn = "border-[var(--cat,var(--ink))] bg-[var(--cat,var(--ink))] text-white";
 

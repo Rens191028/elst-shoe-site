@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
 import type { Faq } from "@/data/faq";
+import { Wave } from "@/components/site/brand";
 import { Reveal } from "@/components/site/motion";
 import { cn } from "@/lib/utils";
 
@@ -198,8 +199,9 @@ export function FaqSection({ items }: { items: Faq[] }) {
   return (
     <section
       aria-labelledby="faq-h"
-      className="bg-gradient-to-b from-[#f6ebe0] to-[#f1e1d3] py-20 md:py-28"
+      className="relative bg-gradient-to-b from-[#f6ebe0] to-[#f1e1d3] pb-20 pt-28 md:pb-28 md:pt-36"
     >
+      <Wave fill="var(--background)" flip className="absolute inset-x-0 top-0" />
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 lg:grid-cols-[minmax(0,360px)_1fr] lg:gap-20 lg:px-6">
         <Reveal className="hidden lg:block">
           <ShoeBox3D open={open} pulse={pulse} className="h-[340px]" />

@@ -5,6 +5,7 @@ import { PriceRows } from "@/components/site/cart";
 import { Photo } from "@/components/site/product";
 import { getProduct, variantLabel, type Product } from "@/lib/catalog";
 import { VoucherActions, VoucherCard } from "@/components/site/VoucherCard";
+import { ConfettiBurst } from "@/components/site/brand";
 import { SITE } from "@/lib/site";
 import { generateVoucherCode, parseVoucherHandle, parseVoucherVariant } from "@/lib/voucher";
 
@@ -91,8 +92,9 @@ function Thanks() {
   return (
     <section className="mx-auto max-w-3xl px-4 py-16 md:py-24">
       <div className="text-center">
-        <span className="anim-fade-up mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cta text-white shadow-lift">
+        <span className="anim-fade-up check-draw relative mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cta text-white shadow-lift">
           <CheckCircle2 className="h-10 w-10" aria-hidden="true" />
+          <ConfettiBurst />
         </span>
         <h1
           className="anim-fade-up mt-6 font-display text-4xl tracking-tight md:text-5xl"

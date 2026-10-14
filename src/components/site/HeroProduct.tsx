@@ -2,7 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { Hand, Truck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { img, money, type Product } from "@/lib/catalog";
-import { Photo } from "@/components/site/product";
+import { Badge, Photo } from "@/components/site/product";
+import { discountPct } from "@/lib/catalog";
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
@@ -16,7 +17,20 @@ export function HeroProduct({ product }: { product: Product }) {
   const card = useRef<HTMLDivElement>(null);
   const floor = useRef<HTMLDivElement>(null);
   const moved = useRef(false);
-  const st = useRef({ dragging: false, sx: 0, sy: 0, bx: 0, by: 0, dx: 0, dy: 0, weight: 1 });
+  const st = useRef({
+    dragging: false,
+    sx: 0,
+    sy: 0,
+    bx: 0,
+    by: 0,
+    dx: 0,
+    dy: 0,
+    weight: 1,
+    vel: 0,
+    lastX: 0,
+    lastT: 0,
+    zoom: 1,
+  });
   const [hint, setHint] = useState(true);
 
   useEffect(() => {
@@ -30,7 +44,11 @@ export function HeroProduct({ product }: { product: Product }) {
     const frame = (t: number) => {
       if (visible && !document.hidden) {
         if (!s.dragging) {
-          s.dx *= 0.94; // losgelaten: sleep-hoek zakt langzaam terug
+          // Momentum: na het loslaten draait het product door en remt natuurlijk af
+          s.dx = clamp(s.dx + s.vel, -42, 42);
+          s.vel *= 0.93;
+          if (Math.abs(s.vel) < 0.02) s.vel = 0;
+          s.dx *= 0.985; // daarna zakt de sleep-hoek langzaam terug
           s.dy *= 0.94;
           s.weight = Math.min(1, s.weight + 0.012); // daarna neemt de auto-rotatie het weer over
         }
@@ -42,7 +60,8 @@ export function HeroProduct({ product }: { product: Product }) {
           el.style.transform = `translate3d(0, ${Math.min(window.scrollY, 800) * 0.12}px, 0)`;
         const ry = s.dx + sway + scroll;
         const rx = s.dy + bob;
-        if (card.current) card.current.style.transform = `rotateY(${ry}deg) rotateX(${rx}deg)`;
+        if (card.current)
+          card.current.style.transform = `rotateY(${ry}deg) rotateX(${rx}deg) scale(${s.zoom})`;
         if (floor.current) {
           floor.current.style.transform = `translateX(${-ry * 0.9}px) scaleX(${1 - Math.min(Math.abs(ry), 45) / 140})`;
           floor.current.style.opacity = String(0.55 - Math.min(Math.abs(ry), 45) / 200);
@@ -67,21 +86,36 @@ export function HeroProduct({ product }: { product: Product }) {
     s.bx = s.dx;
     s.by = s.dy;
     s.weight = 0;
+    s.vel = 0;
+    s.lastX = e.clientX;
+    s.lastT = performance.now();
     moved.current = false;
-    e.currentTarget.setPointerCapture(e.pointerId);
   };
   const move = (e: React.PointerEvent) => {
     const s = st.current;
     if (!s.dragging) return;
     const ddx = e.clientX - s.sx;
     const ddy = e.clientY - s.sy;
-    if (Math.abs(ddx) > 6 || Math.abs(ddy) > 6) moved.current = true;
+    if (!moved.current && (Math.abs(ddx) > 6 || Math.abs(ddy) > 6)) {
+      moved.current = true;
+      // Pas bij echt slepen vastpakken, anders komt een gewone klik niet meer bij de link aan
+      e.currentTarget.setPointerCapture(e.pointerId);
+    }
+    const now = performance.now();
+    const dt = Math.max(1, now - s.lastT);
+    // snelheid in graden per frame (~16ms), zacht gemiddeld zodat het niet schokt
+    s.vel = s.vel * 0.6 + (e.clientX - s.lastX) * 0.35 * (16 / dt) * 0.4;
+    s.lastX = e.clientX;
+    s.lastT = now;
     s.dx = clamp(s.bx + ddx * 0.35, -42, 42);
     s.dy = clamp(s.by - ddy * 0.2, -14, 14);
     if (moved.current) setHint(false);
   };
   const up = () => {
-    st.current.dragging = false;
+    const s = st.current;
+    s.dragging = false;
+    // Wie even stilhoudt voor het loslaten, geeft geen zwaai mee
+    if (performance.now() - s.lastT > 80) s.vel = 0;
   };
 
   return (
@@ -91,6 +125,10 @@ export function HeroProduct({ product }: { product: Product }) {
       onPointerMove={move}
       onPointerUp={up}
       onPointerCancel={up}
+      onDoubleClick={() => {
+        // Lichte zoom aan/uit
+        st.current.zoom = st.current.zoom === 1 ? 1.14 : 1;
+      }}
       // Een sleepgebaar mag de link niet openen
       onClickCapture={(e) => {
         if (moved.current) {
@@ -117,6 +155,15 @@ export function HeroProduct({ product }: { product: Product }) {
             sizes="(min-width:1024px) 440px, 90vw"
           />
         </Link>
+        {discountPct(product) > 0 && (
+          <Badge
+            tone="sale"
+            size="lg"
+            className="pointer-events-none absolute left-4 top-4 [transform:translateZ(70px)]"
+          >
+            -{discountPct(product)}%
+          </Badge>
+        )}
         <div className="pointer-events-none absolute -left-4 bottom-8 hidden rounded-2xl bg-white px-4 py-3 shadow-lift [transform:translateZ(60px)] sm:block">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-soft">Nu</p>
           <p className="font-display text-xl font-extrabold text-primary-text">
@@ -155,7 +202,7 @@ export function HeroProduct({ product }: { product: Product }) {
         aria-hidden="true"
         className={`pointer-events-none mt-3 flex items-center justify-center gap-1.5 text-xs font-medium text-soft transition-opacity duration-500 ${hint ? "opacity-100" : "opacity-0"}`}
       >
-        <Hand className="h-3.5 w-3.5" /> Sleep om te draaien
+        <Hand className="h-3.5 w-3.5" /> Sleep om te draaien · dubbelklik om te zoomen
       </p>
     </div>
   );

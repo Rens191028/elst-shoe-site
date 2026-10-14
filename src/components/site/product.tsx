@@ -122,32 +122,55 @@ export function SalePrice({ product }: { product: Product }) {
   );
 }
 
+/** Eén badge-ontwerp voor alle labels op productfoto's: zelfde vorm, zelfde letter-verhouding. */
+const BADGE_TONE = {
+  sale: "bg-primary text-white",
+  new: "bg-white/95 text-[#141413] shadow-sm",
+  soldout: "bg-ink text-white",
+  low: "bg-[#141413] text-white ring-1 ring-primary",
+} as const;
+export function Badge({
+  tone,
+  size = "sm",
+  className,
+  children,
+}: {
+  tone: keyof typeof BADGE_TONE;
+  size?: "sm" | "lg";
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-block rounded-full font-bold leading-none",
+        size === "lg" ? "px-3.5 py-2 text-base" : "px-2.5 py-1.5 text-[11px]",
+        BADGE_TONE[tone],
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
 export function Badges({ product, sale }: { product: Product; sale?: boolean }) {
   const pct = discountPct(product);
+  const low = lowStock(product);
   return (
     <div className="flex flex-col items-start gap-1.5">
-      {!product.s && (
-        <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-semibold text-white">
-          Uitverkocht
-        </span>
-      )}
+      {!product.s && <Badge tone="soldout">Uitverkocht</Badge>}
       {product.s && pct > 0 && (
-        <span
-          className={cn(
-            "bg-primary font-bold text-white",
-            sale
-              ? "sale-badge rounded-md px-3 py-1.5 font-display text-xl font-extrabold"
-              : "badge-pulse rounded-full px-2.5 py-1 text-[11px]",
-          )}
+        <Badge
+          tone="sale"
+          size={sale ? "lg" : "sm"}
+          className={sale ? "sale-badge" : "badge-pulse"}
         >
           -{pct}%
-        </span>
+        </Badge>
       )}
-      {product.s && isNew(product) && (
-        <span className="rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-ink shadow-sm">
-          Nieuw
-        </span>
-      )}
+      {low !== undefined && <Badge tone="low">Bijna uitverkocht</Badge>}
+      {product.s && isNew(product) && <Badge tone="new">Nieuw</Badge>}
     </div>
   );
 }

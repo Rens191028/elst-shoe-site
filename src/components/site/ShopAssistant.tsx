@@ -225,7 +225,7 @@ export function ShopAssistant() {
         <div
           role="dialog"
           aria-label="Veter, je winkelassistent"
-          className="fixed inset-x-3 bottom-24 z-[60] flex max-h-[min(640px,calc(100dvh-8rem))] flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 motion-reduce:animate-none sm:inset-x-auto sm:right-5 sm:w-[380px]"
+          className="fixed inset-x-3 bottom-24 z-[60] flex max-h-[min(640px,calc(100dvh-8rem))] flex-col overflow-hidden rounded-3xl border border-border bg-card/85 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-300 motion-reduce:animate-none sm:inset-x-auto sm:right-5 sm:w-[380px]"
         >
           <div className="flex items-center gap-3 border-b border-border px-4 py-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cta text-primary-foreground">
